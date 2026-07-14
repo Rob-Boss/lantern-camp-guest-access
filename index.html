@@ -620,6 +620,22 @@
         return;
       }
 
+      // Check if guest has already completed check-in previously
+      const savedCheckin = localStorage.getItem(`lantern_camp_checkin_${token}`);
+      if (savedCheckin) {
+        try {
+          const data = JSON.parse(savedCheckin);
+          if (data && data.doorCode && data.cabinName) {
+            codeDisplay.textContent = data.doorCode;
+            successCabinDisplay.textContent = data.cabinName;
+            showView('success');
+            return;
+          }
+        } catch (e) {
+          console.warn("Could not load previous check-in from storage:", e);
+        }
+      }
+
       try {
         const response = await fetch(`${API_BASE_URL}/api/checkin?token=${encodeURIComponent(token)}`);
         
@@ -684,6 +700,14 @@
         }
 
         const data = await response.json();
+        
+        // Save check-in details locally to allow returning to this view
+        localStorage.setItem(`lantern_camp_checkin_${token}`, JSON.stringify({
+          email: email,
+          doorCode: data.doorCode,
+          cabinName: data.cabinName
+        }));
+
         codeDisplay.textContent = data.doorCode;
         showView('success');
       } catch (err) {
