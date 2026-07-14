@@ -51,11 +51,15 @@ async function appendRowToDrive(creds, rowData) {
     headers: { 'Authorization': `Bearer ${accessToken}` }
   });
   
-  let currentContent = "Timestamp,Token,Cabin,Email,Agreed,OptIn\n";
-  if (getRes.ok) {
-    currentContent = await getRes.text();
-  } else {
-    console.warn("Could not fetch current Drive CSV file content. Using fallback header:", await getRes.text());
+  if (!getRes.ok) {
+    const errText = await getRes.text();
+    throw new Error(`Failed to retrieve current CSV content from Google Drive: ${errText}`);
+  }
+
+  let currentContent = await getRes.text();
+  // If the file is completely empty, initialize it with the header row
+  if (!currentContent || currentContent.trim() === '') {
+    currentContent = "Timestamp,Token,Cabin,Email,Agreed,OptIn\n";
   }
 
   // Format row fields for CSV safety (escaping quotes and commas)
