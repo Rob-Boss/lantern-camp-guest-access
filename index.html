@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Lantern Camp - Guest Check-in</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600&family=Jost:wght@300;400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --terracotta: #8C3B3B;
+      --terracotta-hover: #732A2A;
+      --forest-green: #354535;
+      --amber-gold: #D1A153;
+      --warm-linen: #F4F0EA;
+      --charcoal-pine: #222825;
+      --clean-birch: #FFFFFF;
+      
+      --font-serif: 'Fraunces', 'Libre Baskerville', serif;
+      --font-sans: 'Jost', 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--warm-linen);
+      color: var(--charcoal-pine);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Background decoration */
+    .bg-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.04;
+      background-image: radial-gradient(var(--forest-green) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Container Card */
+    .card {
+      background-color: var(--clean-birch);
+      border: 1px solid rgba(53, 69, 53, 0.12);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(34, 40, 37, 0.08);
+      width: 100%;
+      max-width: 580px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--forest-green), var(--amber-gold), var(--terracotta));
+    }
+
+    /* Typography */
+    h1 {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 28px;
+      color: var(--forest-green);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #606864;
+      text-align: center;
+      margin-bottom: 30px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .cabin-indicator {
+      background-color: rgba(53, 69, 53, 0.06);
+      border: 1px dashed rgba(53, 69, 53, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .cabin-indicator p {
+      font-size: 14px;
+      color: var(--charcoal-pine);
+    }
+
+    .cabin-indicator strong {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      color: var(--forest-green);
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* Scrollable Terms & Waiver Section */
+    .waiver-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--forest-green);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .waiver-box {
+      border: 1px solid rgba(53, 69, 53, 0.15);
+      border-radius: 10px;
+      height: 180px;
+      overflow-y: scroll;
+      padding: 16px;
+      background-color: #FAF9F6;
+      font-size: 13px;
+      color: #4a504c;
+      margin-bottom: 20px;
+    }
+
+    .waiver-box h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--charcoal-pine);
+      font-weight: 600;
+    }
+
+    .waiver-box p {
+      margin-bottom: 12px;
+    }
+
+    .waiver-box ul {
+      margin-bottom: 12px;
+      padding-left: 16px;
+    }
+
+    /* Form Fields */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label.field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--forest-green);
+      margin-bottom: 6px;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(53, 69, 53, 0.2);
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      color: var(--charcoal-pine);
+      background-color: var(--clean-birch);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input[type="email"]:focus {
+      border-color: var(--amber-gold);
+      box-shadow: 0 0 0 3px rgba(209, 161, 83, 0.15);
+    }
+
+    /* Checkboxes */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      margin-right: 12px;
+      accent-color: var(--forest-green);
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      font-size: 13px;
+      color: #4a504c;
+      user-select: none;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      background-color: var(--terracotta);
+      color: var(--clean-birch);
+      border: none;
+      border-radius: 8px;
+      padding: 14px 24px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      background-color: var(--terracotta-hover);
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Loading view styling */
+    .loading-view {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(53, 69, 53, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--forest-green);
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Error view styling */
+    .error-view {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .error-icon {
+      font-size: 48px;
+      color: var(--terracotta);
+      margin-bottom: 16px;
+    }
+
+    /* Success Card Reveal */
+    .success-card {
+      background-color: var(--forest-green);
+      color: var(--warm-linen);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      margin-top: 10px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(53, 69, 53, 0.15);
+    }
+
+    .code-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--amber-gold);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .code-value {
+      font-family: var(--font-serif);
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--clean-birch);
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
+      display: inline-block;
+      min-width: 180px;
+    }
+
+    .success-instructions {
+      text-align: left;
+      margin-top: 24px;
+      border-top: 1px solid rgba(244, 240, 2EA, 0.15);
+      padding-top: 20px;
+    }
+
+    .success-instructions h4 {
+      font-family: var(--font-serif);
+      color: var(--amber-gold);
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .success-instructions p {
+      font-size: 13.5px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+      color: rgba(244, 240, 240, 0.85);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--amber-gold);
+      font-size: 12px;
+      cursor: pointer;
+      display: block;
+      margin: -8px auto 16px;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .copy-btn:hover {
+      color: var(--clean-birch);
+    }
+
+    /* Footer Logo styling */
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(34, 40, 37, 0.5);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-pattern"></div>
+
+  <div class="card">
+    
+    <!-- 1. LOADING VIEW -->
+    <div id="view-loading" class="view active loading-view">
+      <div class="spinner"></div>
+      <p style="font-weight: 500; color: var(--forest-green);">Preparing check-in portal...</p>
+    </div>
+
+    <!-- 2. ERROR VIEW -->
+    <div id="view-error" class="view error-view">
+      <div class="error-icon">⚠️</div>
+      <h1 id="error-title">Check-in Error</h1>
+      <p id="error-message" style="margin-top: 8px; color: #606864; font-size: 15px;">
+        The check-in URL is invalid or has expired. Please verify the link provided by your host.
+      </p>
+    </div>
+
+    <!-- 3. FORM VIEW -->
+    <div id="view-form" class="view">
+      <h1>Welcome to Lantern Camp</h1>
+      <p class="subtitle">Orland, Maine</p>
+
+      <div class="cabin-indicator">
+        <p>You are checking into</p>
+        <strong id="cabin-name-display">Forest Cabin</strong>
+      </div>
+
+      <form id="checkin-form">
+        <span class="waiver-label">Liability Waiver & Terms of Service</span>
+        <div class="waiver-box">
+          <h3>Lantern Camp Orland – Terms and Conditions</h3>
+          <p>Welcome to Lantern Camp. Our goal is to provide an experience rooted in nature, while ensuring the safety and comfort of all guests. Our terms and conditions are below.</p>
+          
+          <p><strong>Guest Responsibility & Liability:</strong><br>
+          Lantern Camp is located in a natural setting comprising wooded and cleared areas in Orland, Maine. Our property features rural and mostly undeveloped land, and guests are fully responsible for their own safety while enjoying the outdoors. Guests should have basic wilderness awareness, including but not limited to: avoiding interactions with wildlife, properly storing food to prevent attracting animals, and exercising caution on uneven terrain.</p>
+          
+          <p>Lantern Camp is not liable for bodily injury (including death) or damage to personal property, including vehicles, due to exposure to inclement weather, wildlife, or the natural, rugged environment. By booking a stay at Lantern Camp, guests acknowledge and accept these risks and affirm they are prepared to navigate a rural setting responsibly.</p>
+          
+          <p>While Lantern Camp is designed to provide a peaceful and secluded experience, our cabins and shared facilities are used by all guests. We take reasonable measures to keep these spaces safe and clean; however, Lantern Camp is not liable for any illness, allergic reaction, or other health issue that may arise from exposure to allergens (including pet dander, cleaning products, or environmental elements), flora, fauna (including ticks and insects), or other natural hazards in the cabins, shared facilities, or anywhere on the property. Guests are responsible for taking necessary health precautions, including managing known allergies, and for maintaining their own hygiene practices.</p>
+          
+          <p>Additionally, guests are responsible for arranging their own transportation to and from Lantern Camp. Lantern Camp does not provide transportation, and failure to secure transportation will not be considered a valid reason for cancellation or rescheduling outside of our standard policies.</p>
+          
+          <p>By booking a stay, guests acknowledge and accept these responsibilities and agree to comply with all safety guidelines provided by Lantern Camp.</p>
+          
+          <p><strong>Prices and Taxes:</strong><br>
+          All rates are quoted in USD and are subject to a 9% Maine lodging tax. Prices are subject to change without notice. Any additional fees, such as cleaning or pet fees, will be disclosed at the time of booking. Bookings are not confirmed until full payment is received.</p>
+          
+          <p><strong>Payment and Terms at Check-in/Check-out:</strong><br>
+          Full payment is required at the time of booking. Accepted payment methods include major credit and debit cards. Check-in time is 3:00 PM, and check-out time is 10:00 AM. Late check-out without prior approval may result in additional fees.</p>
+          
+          <p><strong>Cancellation Policy:</strong><br>
+          Our cancellation policy is detailed in the booking process.</p>
+          
+          <p><strong>Rescheduling Policy:</strong><br>
+          Rescheduling a reservation entails changing the dates of your current reservation. You can reschedule your reservation up to 72 hours prior to check-in time. The updated reservation will be subject to current rates and availability. Once a reservation is rescheduled, the cancellation policy will apply to the original dates of the reservation. You may extend your reservation at any time, subject to availability and pricing, without incurring a change fee. To change the method of payment, you must cancel and rebook your desired reservation. Any payment method changes must be made at least 15 days prior to arrival and are subject to the cancellation policy outlined above. You can reschedule your standard rate reservation by contacting us.</p>
+          
+          <p><strong>Guest Conduct & Property Rules:</strong><br>
+          Quiet hours begin at 9PM and last until 8AM. During quiet hours, guests should refrain from having loud conversations, playing loud music, or generally creating any disturbance.</p>
+          
+          <p>Open flames are permitted only in designated firepit areas. Please never leave a fire unattended. Please use designated firewood only in firepits. Do not cut down branches or trees from the property’s woods. Extinguish fires using water, dirt, or sand only.</p>
+          
+          <p>Never leave food or trash outside as it will attract wild animals to the area. Please respect the local environment.</p>
+          
+          <p>Unruly, disruptive, and destructive behavior and criminal activity is prohibited. Parties, excessively loud music, or any disturbance that results in a neighbor’s complaint or a police visit to the property may result in the at-fault guest being removed from the property.</p>
+          
+          <p><strong>Damage Policy:</strong><br>
+          Guests are responsible for damages to the cabins, property, and structures on the property, beyond normal wear and tear.</p>
+          
+          <p><strong>Traveling with Minors:</strong><br>
+          Minors under 18 years of age must be accompanied by a parent or legal guardian at all times. Guests are responsible for the safety and supervision of minors.</p>
+          
+          <p><strong>Accessibility or Special Needs:</strong><br>
+          Lantern Camp strives to accommodate guests with special needs; however, due to the natural terrain and structure of our accommodations, some areas may be less accessible. Please contact us in advance to discuss specific requirements.</p>
+          
+          <p><strong>Pet Policy:</strong><br>
+          Dogs are allowed on the property for a $59 pet fee per stay. Dogs must remain on leash when outside. Dogs must not be left unattended in the cabins or anywhere on the property. Dog waste must be cleaned up immediately. Guests assume full responsibility for any damage or injury caused by their pet. All guests must be aware that dogs may have occupied the cabin previous to their own stay. Pets other than dogs are not permitted in the cabins. Lantern Camp is not liable for injuries or allergic reactions caused by guest pets. Dogs will be expected to be well behaved and properly vaccinated. No other animals other than dogs will be permitted.</p>
+          
+          <p><strong>Weapons:</strong><br>
+          Weapons of any kind are not allowed on the property.</p>
+          
+          <p><strong>Smoking:</strong><br>
+          Smoking, including the use of e-cigarettes, is prohibited inside the cabins or any building on the property. Litter is not permitted and guests must clean up cigarette butts. Guests may be subject to an additional cleaning fee of up to $150 if a guest is found to be smoking inside of a cabin.</p>
+          
+          <p><strong>Parking:</strong><br>
+          Parking is available on-site for registered guests only. Vehicles must be parked in designated areas. Lantern Camp is not responsible for loss, damage, or theft of vehicles or personal belongings.</p>
+          
+          <p><strong>Lost and Found:</strong><br>
+          Lantern Camp is not responsible for lost or stolen items on the property. It is the guests’ responsibility to ensure all personal belongings are collected upon checkout.</p>
+          
+          <p><strong>Events:</strong><br>
+          Lantern Camp occasionally hosts private and community events. Guests will be notified in advance if an event may impact their stay.</p>
+          
+          <p><strong>Dispute Resolution/Issues:</strong><br>
+          Any disputes or concerns should be reported to Lantern Camp management during the stay to allow for resolution. If a resolution is not reached, disputes will be handled in accordance with the laws of the State of Maine.</p>
+          
+          <p><strong>Use of Personal Information:</strong><br>
+          Guest information is collected for booking purposes and will not be shared with third parties without consent, except as required by law. See our Privacy Policy for more details.</p>
+          
+          <p><strong>Liability:</strong><br>
+          Lantern Camp is located in a natural setting and provides access to outdoor amenities that may pose inherent risks, including exposure to wildlife, allergens, uneven terrain, campfires, and other natural hazards. By booking, guests acknowledge these risks and agree to assume full responsibility for their participation. Lantern Camp is not responsible for accidents, injuries, allergic reactions, or loss of personal property resulting from the use of facilities or natural surroundings.</p>
+          
+          <p><strong>Indemnity:</strong><br>
+          Guests agree to indemnify and hold harmless Lantern Camp, its owners, employees, and affiliates from any claims, damages, or expenses arising from their actions or negligence during their stay.</p>
+          
+          <p><strong>Force Majeure:</strong><br>
+          Lantern Camp is not liable for failure to fulfill obligations due to events beyond our control, such as natural disasters, extreme weather, or government restrictions.</p>
+          
+          <p><strong>Third Party Rights:</strong><br>
+          These terms do not confer any rights to third parties.</p>
+          
+          <p><strong>Waiver:</strong><br>
+          Failure to enforce any provision of these terms does not constitute a waiver of that provision.</p>
+          
+          <p><strong>Severance:</strong><br>
+          If any part of these terms is deemed unenforceable, the remaining provisions will continue in full force and effect.</p>
+        </div>
+
+        <div class="input-group">
+          <label for="guest-email" class="field-label">Your Email Address</label>
+          <input type="email" id="guest-email" required placeholder="Enter your email to receive confirmation">
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="agree-waiver" required>
+          <label for="agree-waiver">
+            I have read and agree to the lodging terms and liability waiver conditions.
+          </label>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="marketing-optin" checked>
+          <label for="marketing-optin">
+            Yes, keep me updated on news, seasonal offers, and events at Lantern Camp (optional).
+          </label>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn" disabled>
+          Agree & Unlock Cabin Code
+        </button>
+      </form>
+    </div>
+
+    <!-- 4. SUCCESS VIEW -->
+    <div id="view-success" class="view">
+      <h1>Enjoy Your Stay</h1>
+      <p class="subtitle" style="margin-bottom: 20px;">Check-in Complete</p>
+
+      <div class="success-card">
+        <p class="code-label">Your Entry Code</p>
+        <div class="code-value" id="code-display">----#</div>
+        <button id="btn-copy" class="copy-btn">Copy code</button>
+        
+        <p style="font-size: 15px; font-weight: 500; color: var(--clean-birch);">
+          Unlocked for <strong id="success-cabin-display">Cabin</strong>
+        </p>
+
+        <div class="success-instructions">
+          <h4>🌲 Arrival Guidelines</h4>
+          <p><strong>Check-in:</strong> After 3:00 PM today. <br><strong>Checkout:</strong> By 10:00 AM on departure day.</p>
+          
+          <h4>🚗 Parking & Access</h4>
+          <p>Please park in the main guest lot. To preserve the tranquility and meadow environment, vehicle access to cabins is not permitted. Carts are available at the edge of the parking lot to help transport your luggage to your cabin (about a 1-5 minute walk).</p>
+          
+          <h4>💬 Need Help?</h4>
+          <p>Addison is on-site and can be reached by reply in your Airbnb thread, or via text/call at <strong>617-922-1399</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span style="font-family: var(--font-serif); font-style: italic;">Lantern Camp</span> &bull; Orland, Maine
+  </footer>
+
+  <script>
+    // Configuration
+    const API_BASE_URL = window.location.origin;
+
+    // Elements
+    const views = {
+      loading: document.getElementById('view-loading'),
+      error: document.getElementById('view-error'),
+      form: document.getElementById('view-form'),
+      success: document.getElementById('view-success')
+    };
+
+    const errorTitle = document.getElementById('error-title');
+    const errorMessage = document.getElementById('error-message');
+    const cabinNameDisplay = document.getElementById('cabin-name-display');
+    const successCabinDisplay = document.getElementById('success-cabin-display');
+    const codeDisplay = document.getElementById('code-display');
+    
+    const checkinForm = document.getElementById('checkin-form');
+    const guestEmail = document.getElementById('guest-email');
+    const agreeWaiver = document.getElementById('agree-waiver');
+    const marketingOptin = document.getElementById('marketing-optin');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnCopy = document.getElementById('btn-copy');
+
+    // Get token from URL query parameter 't' or path
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('t');
+
+    // Switch view helper
+    function showView(viewId) {
+      Object.keys(views).forEach(key => {
+        if (key === viewId) {
+          views[key].classList.add('active');
+        } else {
+          views[key].classList.remove('active');
+        }
+      });
+    }
+
+    // Enable/Disable submit button based on agreement checkbox
+    agreeWaiver.addEventListener('change', () => {
+      submitBtn.disabled = !agreeWaiver.checked;
+    });
+
+    // Copy to clipboard helper
+    btnCopy.addEventListener('click', () => {
+      const codeText = codeDisplay.textContent;
+      navigator.clipboard.writeText(codeText).then(() => {
+        btnCopy.textContent = "Copied!";
+        setTimeout(() => {
+          btnCopy.textContent = "Copy code";
+        }, 2000);
+      });
+    });
+
+    // Load cabin metadata on initialization
+    async function initCheckin() {
+      if (!token) {
+        showError('Invalid Link', 'No check-in token was found in the URL. Please verify the link sent to you.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/checkin?token=${encodeURIComponent(token)}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            showError('Invalid Token', 'This check-in code is not recognized. Please contact your host.');
+          } else {
+            showError('Connection Error', 'We could not connect to the check-in server. Please refresh the page and try again.');
+          }
+          return;
+        }
+
+        const data = await response.json();
+        cabinNameDisplay.textContent = data.cabinName;
+        successCabinDisplay.textContent = data.cabinName;
+        showView('form');
+      } catch (err) {
+        console.error('Error fetching cabin details:', err);
+        showError('Connection Error', 'An unexpected error occurred while loading your check-in card.');
+      }
+    }
+
+    function showError(title, message) {
+      errorTitle.textContent = title;
+      errorMessage.textContent = message;
+      showView('error');
+    }
+
+    // Handle Form Submission
+    checkinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = guestEmail.value.trim();
+      const optIn = marketingOptin.checked;
+
+      if (!email || !agreeWaiver.checked) {
+        alert("Please provide your email address and agree to the waiver terms.");
+        return;
+      }
+
+      // Disable inputs and show loading state on button
+      submitBtn.disabled = true;
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.textContent = "Registering...";
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/checkin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            token: token,
+            email: email,
+            optIn: optIn
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || 'Failed to complete check-in.');
+        }
+
+        const data = await response.json();
+        codeDisplay.textContent = data.doorCode;
+        showView('success');
+      } catch (err) {
+        console.error('Submit error:', err);
+        alert(`Error registering check-in: ${err.message}. Please try again.`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+    });
+
+    // Start
+    initCheckin();
+  </script>
+</body>
+</html>

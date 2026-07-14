@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/:token([a-zA-Z0-9]{6})",
+      "destination": "/index.html?t=:token"
+    }
+  ]
+}
