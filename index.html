@@ -580,7 +580,10 @@
 
     // Get token from URL query parameter 't' or path
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('t');
+    const token = urlParams.get('t') || (() => {
+      const pathToken = window.location.pathname.replace(/^\/|\/$/g, '');
+      return (pathToken.length === 6 && /^[a-zA-Z0-9]+$/.test(pathToken)) ? pathToken : null;
+    })();
 
     // Switch view helper
     function showView(viewId) {

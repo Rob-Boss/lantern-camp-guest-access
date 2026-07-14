@@ -83,14 +83,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Rewrite /:token (6 character alphanumeric string) to index.html with pre-injected token
+  // Rewrite /:token (6 character alphanumeric string) to index.html (client-side JS will resolve the token)
   const tokenMatch = pathname.match(/^\/([a-zA-Z0-9]{6})$/);
   if (tokenMatch) {
-    const token = tokenMatch[1];
     res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-    let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-    // Inject parsed token value directly into script
-    html = html.replace("const token = urlParams.get('t');", `const token = '${token}';`);
+    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
     res.end(html);
     return;
   }
