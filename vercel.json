@@ -1,6 +1,11 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "server.js": {
+      "includeFiles": "favicon.*"
+    }
+  },
   "rewrites": [
     {
       "source": "/:token([a-zA-Z0-9]{6})",
