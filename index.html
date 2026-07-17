@@ -398,7 +398,7 @@
 
     <!-- 3. FORM VIEW -->
     <div id="view-form" class="view">
-      <h1>Welcome to Lantern Camp</h1>
+      <h1 id="welcome-title">Welcome to Lantern Camp</h1>
       <p class="subtitle">Orland, Maine</p>
 
       <div class="cabin-indicator">
@@ -638,7 +638,7 @@
       const checkoutDate = urlParams.get('checkout');
 
       if (name) {
-        document.querySelector('h1').textContent = `Welcome, ${name}!`;
+        document.getElementById('welcome-title').textContent = `Welcome, ${name}!`;
       }
       if (checkinDate) {
         document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(checkinDate)}`;
