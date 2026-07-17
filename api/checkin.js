@@ -59,7 +59,7 @@ async function appendRowToDrive(creds, rowData) {
   let currentContent = await getRes.text();
   // If the file is completely empty, initialize it with the header row
   if (!currentContent || currentContent.trim() === '') {
-    currentContent = "Timestamp,Token,Cabin,Email,Agreed,OptIn\n";
+    currentContent = "Timestamp,Token,Cabin,Email,Agreed,OptIn,Name,BookingID,CheckInDate,CheckOutDate\n";
   }
 
   // Format row fields for CSV safety (escaping quotes and commas)
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
 
     // POST Request: Agree to waiver, save details, and return door code
     if (req.method === 'POST') {
-      const { email, optIn } = body;
+      const { email, optIn, name, booking, checkin, checkout } = body;
       
       if (!email) {
         return res.status(400).json({ error: 'Email address is required to check in.' });
@@ -148,7 +148,11 @@ export default async function handler(req, res) {
         cabinInfo.cabinName,
         email,
         'TRUE',
-        optIn ? 'TRUE' : 'FALSE'
+        optIn ? 'TRUE' : 'FALSE',
+        name || '',
+        booking || '',
+        checkin || '',
+        checkout || ''
       ]);
 
       // Return the cabin door code
