@@ -155,6 +155,29 @@ export default async function handler(req, res) {
         checkout || ''
       ]);
 
+      // Trigger Webhook asynchronously to update operations portal in real-time
+      if (booking) {
+        const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+        const webhookSecret = process.env.CHECKIN_WEBHOOK_SECRET;
+        
+        fetch(`${operationsApiUrl}/api/checkin/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(webhookSecret ? { 'X-Checkin-Secret': webhookSecret } : {})
+          },
+          body: JSON.stringify({
+            booking_id: booking,
+            name: name || '',
+            email: email,
+            timestamp: timestamp,
+            cabin_name: cabinInfo.cabinName
+          })
+        }).catch(err => {
+          console.error("Failed to forward checkin webhook:", err);
+        });
+      }
+
       // Return the cabin door code
       return res.status(200).json({
         success: true,
