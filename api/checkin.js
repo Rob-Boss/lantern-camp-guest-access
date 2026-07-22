@@ -125,17 +125,34 @@ export default async function handler(req, res) {
     // GET Request: Retrieve cabin & booking details without revealing door code
     if (req.method === 'GET') {
       let bookingDetails = null;
-      if (activeToken) {
+      const qName = req.query.name || req.query.firstname || '';
+      const qCheckin = req.query.checkin || '';
+      const targetCode = code || token || activeToken;
+
+      if (targetCode || qName || qCheckin) {
         try {
           const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
           const bRes = await fetch(`${operationsApiUrl}/api/dashboard/bookings`);
           if (bRes.ok) {
             const data = await bRes.json();
             const bookings = data.bookings || [];
-            bookingDetails = bookings.find(b => 
-              String(b.id) === String(activeToken) || 
-              (b.notes && b.notes.toLowerCase().includes(String(activeToken).toLowerCase()))
-            );
+            
+            // 1. Try matching by ID or notes
+            if (targetCode) {
+              bookingDetails = bookings.find(b => 
+                String(b.id) === String(targetCode) || 
+                (b.notes && b.notes.toLowerCase().includes(String(targetCode).toLowerCase()))
+              );
+            }
+            
+            // 2. Fallback: Try matching by guest name & checkin date
+            if (!bookingDetails && (qName || qCheckin)) {
+              bookingDetails = bookings.find(b => {
+                const matchName = qName ? (b.guest_name || '').toLowerCase().includes(qName.toLowerCase()) : true;
+                const matchDate = qCheckin ? String(b.check_in_date) === String(qCheckin) : true;
+                return matchName && matchDate;
+              });
+            }
           }
         } catch (e) {
           console.error("Error looking up booking details:", e);
