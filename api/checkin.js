@@ -104,26 +104,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { token } = req.query;
+    const { token, code } = req.query;
     let body = {};
     if (req.method === 'POST') {
       body = req.body || {};
     }
     
-    const activeToken = token || body.token;
+    const activeToken = token || code || body.token || body.code;
     
     let cabinInfo = cabins[activeToken];
-    if (!cabinInfo && activeToken) {
-      // Fallback for general waiver links prior to cabin assignment
+    if (!cabinInfo) {
+      // Fallback for general waiver links and Airbnb confirmation codes prior to cabin assignment
       cabinInfo = {
         cabinName: "Lantern Camp Orland",
         doorCode: "SMS",
         type: "General"
       };
-    }
-    
-    if (!cabinInfo) {
-      return res.status(400).json({ error: 'Missing required parameter "token".' });
     }
 
     // GET Request: Retrieve cabin details without revealing door code
@@ -137,6 +133,7 @@ export default async function handler(req, res) {
     // POST Request: Agree to waiver, save contact details, and notify operations
     if (req.method === 'POST') {
       const { email, phone, optIn, name, booking, checkin, checkout } = body;
+      const bookingCode = booking || code || activeToken || '';
       
       if (!email || !phone) {
         return res.status(400).json({ error: 'Email address and phone number are required to check in.' });
@@ -173,7 +170,7 @@ export default async function handler(req, res) {
             ...(webhookSecret ? { 'X-Checkin-Secret': webhookSecret } : {})
           },
           body: JSON.stringify({
-            booking_id: booking || '',
+            booking_id: bookingCode || booking || '',
             name: name || '',
             email: email || '',
             phone: phone || '',
