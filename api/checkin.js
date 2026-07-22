@@ -122,10 +122,31 @@ export default async function handler(req, res) {
       };
     }
 
-    // GET Request: Retrieve cabin details without revealing door code
+    // GET Request: Retrieve cabin & booking details without revealing door code
     if (req.method === 'GET') {
+      let bookingDetails = null;
+      if (activeToken) {
+        try {
+          const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+          const bRes = await fetch(`${operationsApiUrl}/api/dashboard/bookings`);
+          if (bRes.ok) {
+            const data = await bRes.json();
+            const bookings = data.bookings || [];
+            bookingDetails = bookings.find(b => 
+              String(b.id) === String(activeToken) || 
+              (b.notes && b.notes.toLowerCase().includes(String(activeToken).toLowerCase()))
+            );
+          }
+        } catch (e) {
+          console.error("Error looking up booking details:", e);
+        }
+      }
+
       return res.status(200).json({
-        cabinName: cabinInfo.cabinName,
+        cabinName: (bookingDetails && bookingDetails.cabin_name) ? bookingDetails.cabin_name : cabinInfo.cabinName,
+        guestName: (bookingDetails && bookingDetails.guest_name) ? bookingDetails.guest_name : "",
+        checkinDate: (bookingDetails && bookingDetails.check_in_date) ? bookingDetails.check_in_date : "",
+        checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? bookingDetails.check_out_date : "",
         type: cabinInfo.type
       });
     }

@@ -606,9 +606,9 @@
     const submitBtn = document.getElementById('submit-btn');
     const btnChangePhone = document.getElementById('btn-change-phone');
 
-    // Get token from URL query parameter 't' or path
+    // Get token or reservation code from URL query parameter ('code', 't', or path)
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('t') || (() => {
+    const token = urlParams.get('code') || urlParams.get('t') || (() => {
       const pathToken = window.location.pathname.replace(/^\/|\/$/g, '');
       return (pathToken.length >= 5 && /^[a-zA-Z0-9]+$/.test(pathToken)) ? pathToken : null;
     })() || 'waiver';
@@ -715,7 +715,7 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/checkin?token=${encodeURIComponent(token)}`);
+        const response = await fetch(`${API_BASE_URL}/api/checkin?code=${encodeURIComponent(token)}&token=${encodeURIComponent(token)}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -727,8 +727,22 @@
         }
 
         const data = await response.json();
-        cabinNameDisplay.textContent = data.cabinName;
-        successCabinDisplay.textContent = data.cabinName;
+        if (data.cabinName) {
+          cabinNameDisplay.textContent = data.cabinName;
+          successCabinDisplay.textContent = data.cabinName;
+        }
+        if (data.guestName && !guestFirstname.value) {
+          document.getElementById('welcome-title').textContent = `Welcome, ${data.guestName}!`;
+          const parts = data.guestName.trim().split(' ');
+          guestFirstname.value = parts[0] || '';
+          guestLastname.value = parts.slice(1).join(' ') || '';
+        }
+        if (data.checkinDate) {
+          document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(data.checkinDate)}`;
+        }
+        if (data.checkoutDate) {
+          document.getElementById('checkout-time-display').textContent = `By 10:00 AM on ${formatStayDate(data.checkoutDate)}`;
+        }
         showView('form');
       } catch (err) {
         console.error('Error fetching cabin details:', err);
