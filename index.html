@@ -638,13 +638,21 @@
       });
     }
 
-    // Helper to format Date: YYYY-MM-DD -> "Thursday, July 16"
+    // Helper to format any date string format (YYYY-MM-DD, MM/DD/YYYY, text dates, etc.) -> "Thursday, July 23"
     function formatStayDate(dateStr) {
       if (!dateStr) return '';
-      const parts = dateStr.split('-');
-      if (parts.length !== 3) return dateStr;
-      const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-      return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      try {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+          const parts = dateStr.split('-');
+          const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+          return dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        }
+      } catch (e) {}
+      return dateStr;
     }
 
     async function initCheckin() {
