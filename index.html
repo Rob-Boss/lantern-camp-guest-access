@@ -398,12 +398,11 @@
 
     <!-- 3. FORM VIEW -->
     <div id="view-form" class="view">
-      <h1 id="welcome-title">Welcome to Lantern Camp</h1>
-      <p class="subtitle">Orland, Maine</p>
+      <h1 id="welcome-title">Guest Liability Waiver</h1>
 
       <div class="cabin-indicator">
-        <p>You are checking into</p>
-        <strong id="cabin-name-display">Forest Cabin</strong>
+        <p>Liability Waiver Registration for</p>
+        <strong id="cabin-name-display">Lantern Camp Orland</strong>
       </div>
 
       <form id="checkin-form">
@@ -496,26 +495,32 @@
           If any part of these terms is deemed unenforceable, the remaining provisions will continue in full force and effect.</p>
         </div>
 
-        <div class="input-group">
-          <label for="guest-name" class="field-label">Full Name</label>
-          <input type="text" id="guest-name" required placeholder="Enter your full name" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
+        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+          <div style="flex: 1;">
+            <label for="guest-firstname" class="field-label">First Name <span style="color: #c53030; font-size: 11px; text-transform: none; margin-left: 2px;">*Required</span></label>
+            <input type="text" id="guest-firstname" required placeholder="First Name" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
+          </div>
+          <div style="flex: 1;">
+            <label for="guest-lastname" class="field-label">Last Name <span style="color: #c53030; font-size: 11px; text-transform: none; margin-left: 2px;">*Required</span></label>
+            <input type="text" id="guest-lastname" required placeholder="Last Name" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
+          </div>
         </div>
 
         <div class="input-group">
-          <label for="guest-phone" class="field-label">Mobile Phone Number (For Access Codes via SMS)</label>
+          <label for="guest-phone" class="field-label">Mobile Phone Number <span style="color: #c53030; font-size: 11px; text-transform: none; margin-left: 2px;">*Required</span></label>
           <input type="tel" id="guest-phone" required placeholder="e.g. (207) 555-0199" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
           <p style="font-size: 12px; color: #606864; margin-top: 4px;">Cabin assignment, door code, and gate code access are sent via SMS text message.</p>
         </div>
 
         <div class="input-group">
-          <label for="guest-email" class="field-label">Your Email Address</label>
+          <label for="guest-email" class="field-label">Email Address <span style="color: #c53030; font-size: 11px; text-transform: none; margin-left: 2px;">*Required</span></label>
           <input type="email" id="guest-email" required placeholder="Enter your email address">
         </div>
 
         <div class="checkbox-group">
           <input type="checkbox" id="agree-waiver" required>
           <label for="agree-waiver">
-            I have read and agree to the lodging terms and liability waiver conditions.
+            I have read and agree to the lodging terms and liability waiver conditions. <span style="color: #c53030; font-size: 11px;">*Required</span>
           </label>
         </div>
 
@@ -535,7 +540,7 @@
     <!-- 4. SUCCESS VIEW -->
     <div id="view-success" class="view">
       <h1>Waiver Signed & Confirmed</h1>
-      <p class="subtitle" style="margin-bottom: 20px;">Thank You For Completing Check-In</p>
+      <p class="subtitle" style="margin-bottom: 20px;">Thank You For Completing Waiver Registration</p>
 
       <div class="success-card">
         <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: left;">
@@ -546,7 +551,7 @@
         </div>
 
         <p style="font-size: 15px; font-weight: 500; color: var(--clean-birch);">
-          Registration Confirmed for <strong id="success-cabin-display">Lantern Camp</strong>
+          Registration Confirmed for <strong id="success-cabin-display">Lantern Camp Orland</strong>
         </p>
 
         <div class="success-instructions">
@@ -593,7 +598,8 @@
     const successPhoneDisplay = document.getElementById('success-phone-display');
     
     const checkinForm = document.getElementById('checkin-form');
-    const guestName = document.getElementById('guest-name');
+    const guestFirstname = document.getElementById('guest-firstname');
+    const guestLastname = document.getElementById('guest-lastname');
     const guestPhone = document.getElementById('guest-phone');
     const guestEmail = document.getElementById('guest-email');
     const agreeWaiver = document.getElementById('agree-waiver');
@@ -635,14 +641,25 @@
     async function initCheckin() {
       // Customize greeting and pre-fill form fields if parameters are present in URL
       const urlName = urlParams.get('name');
+      const urlFirstName = urlParams.get('firstname');
+      const urlLastName = urlParams.get('lastname');
       const urlEmail = urlParams.get('email');
       const urlPhone = urlParams.get('phone');
       const checkinDate = urlParams.get('checkin');
       const checkoutDate = urlParams.get('checkout');
 
-      if (urlName) {
+      if (urlFirstName || urlLastName) {
+        guestFirstname.value = urlFirstName || '';
+        guestLastname.value = urlLastName || '';
+        const displayName = (urlFirstName + ' ' + urlLastName).trim();
+        if (displayName) {
+          document.getElementById('welcome-title').textContent = `Welcome, ${displayName}!`;
+        }
+      } else if (urlName) {
         document.getElementById('welcome-title').textContent = `Welcome, ${urlName}!`;
-        guestName.value = urlName;
+        const parts = urlName.trim().split(' ');
+        guestFirstname.value = parts[0] || '';
+        guestLastname.value = parts.slice(1).join(' ') || '';
       }
       if (urlEmail) {
         guestEmail.value = urlEmail;
@@ -663,7 +680,7 @@
         try {
           const data = JSON.parse(savedCheckin);
           if (data) {
-            successCabinDisplay.textContent = data.cabinName || 'Lantern Camp';
+            successCabinDisplay.textContent = data.cabinName || 'Lantern Camp Orland';
             if (data.phone) {
               successPhoneDisplay.textContent = data.phone;
             }
@@ -707,13 +724,15 @@
     checkinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const name = guestName.value.trim();
+      const firstName = guestFirstname.value.trim();
+      const lastName = guestLastname.value.trim();
+      const name = `${firstName} ${lastName}`.trim();
       const phone = guestPhone.value.trim();
       const email = guestEmail.value.trim();
       const optIn = marketingOptin.checked;
 
-      if (!name || !phone || !email || !agreeWaiver.checked) {
-        alert("Please provide your full name, phone number, email address, and agree to the waiver terms.");
+      if (!firstName || !lastName || !phone || !email || !agreeWaiver.checked) {
+        alert("Please provide your first name, last name, phone number, email address, and agree to the waiver terms.");
         return;
       }
 
@@ -731,6 +750,8 @@
           body: JSON.stringify({
             token: token,
             name: name,
+            firstname: firstName,
+            lastname: lastName,
             phone: phone,
             email: email,
             optIn: optIn,
@@ -755,7 +776,7 @@
           cabinName: data.cabinName
         }));
 
-        successCabinDisplay.textContent = data.cabinName || 'Lantern Camp';
+        successCabinDisplay.textContent = data.cabinName || 'Lantern Camp Orland';
         successPhoneDisplay.textContent = phone;
         showView('success');
       } catch (err) {

@@ -116,7 +116,7 @@ export default async function handler(req, res) {
     if (!cabinInfo && activeToken) {
       // Fallback for general waiver links prior to cabin assignment
       cabinInfo = {
-        cabinName: "Lantern Camp Stay",
+        cabinName: "Lantern Camp Orland",
         doorCode: "SMS",
         type: "General"
       };
