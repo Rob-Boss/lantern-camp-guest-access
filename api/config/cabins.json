@@ -118,5 +118,10 @@
     "cabinName": "Forest Cabin 24",
     "doorCode": "3612",
     "type": "Forest"
+  },
+  "waiver": {
+    "cabinName": "Lantern Camp Stay",
+    "doorCode": "SMS",
+    "type": "General"
   }
 }

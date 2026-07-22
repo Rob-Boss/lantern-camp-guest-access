@@ -497,6 +497,17 @@
         </div>
 
         <div class="input-group">
+          <label for="guest-name" class="field-label">Full Name</label>
+          <input type="text" id="guest-name" required placeholder="Enter your full name" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
+        </div>
+
+        <div class="input-group">
+          <label for="guest-phone" class="field-label">Mobile Phone Number (For Access Codes via SMS)</label>
+          <input type="tel" id="guest-phone" required placeholder="e.g. (207) 555-0199" style="width: 100%; padding: 12px 16px; border: 1px solid rgba(53, 69, 53, 0.2); border-radius: 8px; font-family: var(--font-sans); font-size: 15px; color: var(--charcoal-pine); background-color: var(--clean-birch); outline: none;">
+          <p style="font-size: 12px; color: #606864; margin-top: 4px;">Cabin assignment, door code, and gate code access are sent via SMS text message.</p>
+        </div>
+
+        <div class="input-group">
           <label for="guest-email" class="field-label">Your Email Address</label>
           <input type="email" id="guest-email" required placeholder="Enter your email address">
         </div>
@@ -516,23 +527,26 @@
         </div>
 
         <button type="submit" id="submit-btn" class="btn" disabled>
-          Agree & Unlock Cabin Code
+          Sign Waiver & Confirm Contact Info
         </button>
       </form>
     </div>
 
     <!-- 4. SUCCESS VIEW -->
     <div id="view-success" class="view">
-      <h1>Enjoy Your Stay</h1>
-      <p class="subtitle" style="margin-bottom: 20px;">Check-in Complete</p>
+      <h1>Waiver Signed & Confirmed</h1>
+      <p class="subtitle" style="margin-bottom: 20px;">Thank You For Completing Check-In</p>
 
       <div class="success-card">
-        <p class="code-label">Your Entry Code</p>
-        <div class="code-value" id="code-display">----</div>
-        <button id="btn-copy" class="copy-btn">Copy code</button>
-        
+        <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: left;">
+          <p class="code-label" style="display: flex; align-items: center; gap: 6px;">📱 ACCESS CODES VIA SMS</p>
+          <p style="font-size: 15px; color: var(--clean-birch); line-height: 1.5; margin-top: 6px;">
+            Your cabin assignment, door entry code, and gate access code will be sent to <strong id="success-phone-display" style="color: var(--amber-gold);">your phone number</strong> via SMS text message prior to check-in.
+          </p>
+        </div>
+
         <p style="font-size: 15px; font-weight: 500; color: var(--clean-birch);">
-          Unlocked for <strong id="success-cabin-display">Cabin</strong>
+          Registration Confirmed for <strong id="success-cabin-display">Lantern Camp</strong>
         </p>
 
         <div class="success-instructions">
@@ -544,9 +558,12 @@
           <strong>Written Directions:</strong> Navigate to 85 Dodge Hill Rd, Orland, ME 04472. Take Dodge Hill Rd to the crest of the hill and then descend 300ft or so until you get to a gravel turnaround area. Bear right. Drive under the transmission lines and through the gate. Take your first right, about 200ft past the gate. Take the road up until you see a shingled building on your left, and a parking area on your right. Park in the parking area! If you have an EV, feel free to use one of our chargers.
           <br><br>
           Please park in the main guest lot. To preserve the meadow environment, vehicle access to cabins is not permitted. Carts are available at the edge of the parking lot to help transport your luggage to your cabin (1-5 minute walk).</p>
+
+          <h4>📶 Wi-Fi Access</h4>
+          <p><strong>Network:</strong> LC Orland Guest <br><strong>Password:</strong> BlueberryPie</p>
           
           <h4>💬 Need Help?</h4>
-          <p>The GM is on-site and can be reached by reply in your Airbnb thread.</p>
+          <p>The GM is on-site and can be reached by reply in your message thread.</p>
         </div>
       </div>
     </div>
@@ -573,21 +590,22 @@
     const errorMessage = document.getElementById('error-message');
     const cabinNameDisplay = document.getElementById('cabin-name-display');
     const successCabinDisplay = document.getElementById('success-cabin-display');
-    const codeDisplay = document.getElementById('code-display');
+    const successPhoneDisplay = document.getElementById('success-phone-display');
     
     const checkinForm = document.getElementById('checkin-form');
+    const guestName = document.getElementById('guest-name');
+    const guestPhone = document.getElementById('guest-phone');
     const guestEmail = document.getElementById('guest-email');
     const agreeWaiver = document.getElementById('agree-waiver');
     const marketingOptin = document.getElementById('marketing-optin');
     const submitBtn = document.getElementById('submit-btn');
-    const btnCopy = document.getElementById('btn-copy');
 
     // Get token from URL query parameter 't' or path
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('t') || (() => {
       const pathToken = window.location.pathname.replace(/^\/|\/$/g, '');
-      return (pathToken.length === 6 && /^[a-zA-Z0-9]+$/.test(pathToken)) ? pathToken : null;
-    })();
+      return (pathToken.length >= 5 && /^[a-zA-Z0-9]+$/.test(pathToken)) ? pathToken : null;
+    })() || 'waiver';
 
     // Switch view helper
     function showView(viewId) {
@@ -605,18 +623,6 @@
       submitBtn.disabled = !agreeWaiver.checked;
     });
 
-    // Copy to clipboard helper
-    btnCopy.addEventListener('click', () => {
-      const codeText = codeDisplay.textContent;
-      navigator.clipboard.writeText(codeText).then(() => {
-        btnCopy.textContent = "Copied!";
-        setTimeout(() => {
-          btnCopy.textContent = "Copy code";
-        }, 2000);
-      });
-    });
-
-    // Load cabin metadata on initialization
     // Helper to format Date: YYYY-MM-DD -> "Thursday, July 16"
     function formatStayDate(dateStr) {
       if (!dateStr) return '';
@@ -627,18 +633,22 @@
     }
 
     async function initCheckin() {
-      if (!token) {
-        showError('Invalid Link', 'No check-in token was found in the URL. Please verify the link sent to you.');
-        return;
-      }
-
-      // Customize greeting and dates if parameters are present in URL
-      const name = urlParams.get('name');
+      // Customize greeting and pre-fill form fields if parameters are present in URL
+      const urlName = urlParams.get('name');
+      const urlEmail = urlParams.get('email');
+      const urlPhone = urlParams.get('phone');
       const checkinDate = urlParams.get('checkin');
       const checkoutDate = urlParams.get('checkout');
 
-      if (name) {
-        document.getElementById('welcome-title').textContent = `Welcome, ${name}!`;
+      if (urlName) {
+        document.getElementById('welcome-title').textContent = `Welcome, ${urlName}!`;
+        guestName.value = urlName;
+      }
+      if (urlEmail) {
+        guestEmail.value = urlEmail;
+      }
+      if (urlPhone) {
+        guestPhone.value = urlPhone;
       }
       if (checkinDate) {
         document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(checkinDate)}`;
@@ -652,9 +662,11 @@
       if (savedCheckin) {
         try {
           const data = JSON.parse(savedCheckin);
-          if (data && data.doorCode && data.cabinName) {
-            codeDisplay.textContent = data.doorCode;
-            successCabinDisplay.textContent = data.cabinName;
+          if (data) {
+            successCabinDisplay.textContent = data.cabinName || 'Lantern Camp';
+            if (data.phone) {
+              successPhoneDisplay.textContent = data.phone;
+            }
             showView('success');
             return;
           }
@@ -695,11 +707,13 @@
     checkinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const name = guestName.value.trim();
+      const phone = guestPhone.value.trim();
       const email = guestEmail.value.trim();
       const optIn = marketingOptin.checked;
 
-      if (!email || !agreeWaiver.checked) {
-        alert("Please provide your email address and agree to the waiver terms.");
+      if (!name || !phone || !email || !agreeWaiver.checked) {
+        alert("Please provide your full name, phone number, email address, and agree to the waiver terms.");
         return;
       }
 
@@ -716,9 +730,10 @@
           },
           body: JSON.stringify({
             token: token,
+            name: name,
+            phone: phone,
             email: email,
             optIn: optIn,
-            name: urlParams.get('name') || '',
             booking: urlParams.get('booking') || '',
             checkin: urlParams.get('checkin') || '',
             checkout: urlParams.get('checkout') || ''
@@ -734,12 +749,14 @@
         
         // Save check-in details locally to allow returning to this view
         localStorage.setItem(`lantern_camp_checkin_${token}`, JSON.stringify({
+          name: name,
+          phone: phone,
           email: email,
-          doorCode: data.doorCode,
           cabinName: data.cabinName
         }));
 
-        codeDisplay.textContent = data.doorCode;
+        successCabinDisplay.textContent = data.cabinName || 'Lantern Camp';
+        successPhoneDisplay.textContent = phone;
         showView('success');
       } catch (err) {
         console.error('Submit error:', err);

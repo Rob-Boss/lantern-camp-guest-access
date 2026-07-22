@@ -59,7 +59,7 @@ async function appendRowToDrive(creds, rowData) {
   let currentContent = await getRes.text();
   // If the file is completely empty, initialize it with the header row
   if (!currentContent || currentContent.trim() === '') {
-    currentContent = "Timestamp,Token,Cabin,Email,Agreed,OptIn,Name,BookingID,CheckInDate,CheckOutDate\n";
+    currentContent = "Timestamp,Token,Cabin,Email,Phone,Agreed,OptIn,Name,BookingID,CheckInDate,CheckOutDate\n";
   }
 
   // Format row fields for CSV safety (escaping quotes and commas)
@@ -112,13 +112,18 @@ export default async function handler(req, res) {
     
     const activeToken = token || body.token;
     
-    if (!activeToken) {
-      return res.status(400).json({ error: 'Missing required parameter "token".' });
+    let cabinInfo = cabins[activeToken];
+    if (!cabinInfo && activeToken) {
+      // Fallback for general waiver links prior to cabin assignment
+      cabinInfo = {
+        cabinName: "Lantern Camp Stay",
+        doorCode: "SMS",
+        type: "General"
+      };
     }
-
-    const cabinInfo = cabins[activeToken];
+    
     if (!cabinInfo) {
-      return res.status(404).json({ error: 'Invalid check-in token.' });
+      return res.status(400).json({ error: 'Missing required parameter "token".' });
     }
 
     // GET Request: Retrieve cabin details without revealing door code
@@ -129,12 +134,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // POST Request: Agree to waiver, save details, and return door code
+    // POST Request: Agree to waiver, save contact details, and notify operations
     if (req.method === 'POST') {
-      const { email, optIn, name, booking, checkin, checkout } = body;
+      const { email, phone, optIn, name, booking, checkin, checkout } = body;
       
-      if (!email) {
-        return res.status(400).json({ error: 'Email address is required to check in.' });
+      if (!email || !phone) {
+        return res.status(400).json({ error: 'Email address and phone number are required to check in.' });
       }
 
       // Capture check-in timestamp (UTC format)
@@ -147,6 +152,7 @@ export default async function handler(req, res) {
         activeToken,
         cabinInfo.cabinName,
         email,
+        phone || '',
         'TRUE',
         optIn ? 'TRUE' : 'FALSE',
         name || '',
@@ -171,6 +177,7 @@ export default async function handler(req, res) {
               booking_id: booking,
               name: name || '',
               email: email,
+              phone: phone || '',
               timestamp: timestamp,
               cabin_name: cabinInfo.cabinName
             })
@@ -180,12 +187,11 @@ export default async function handler(req, res) {
         }
       }
 
-      // Return the cabin door code
+      // Return success confirmation (door codes sent separately via SMS)
       return res.status(200).json({
         success: true,
         cabinName: cabinInfo.cabinName,
-        doorCode: cabinInfo.doorCode,
-        message: 'Waiver agreed and door code unlocked.'
+        message: 'Waiver agreed and contact details confirmed. Access codes will be sent via SMS.'
       });
     }
 
