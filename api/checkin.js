@@ -162,29 +162,27 @@ export default async function handler(req, res) {
       ]);
 
       // Trigger Webhook to update operations portal in real-time
-      if (booking) {
-        const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
-        const webhookSecret = process.env.CHECKIN_WEBHOOK_SECRET;
-        
-        try {
-          await fetch(`${operationsApiUrl}/api/checkin/complete`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(webhookSecret ? { 'X-Checkin-Secret': webhookSecret } : {})
-            },
-            body: JSON.stringify({
-              booking_id: booking,
-              name: name || '',
-              email: email,
-              phone: phone || '',
-              timestamp: timestamp,
-              cabin_name: cabinInfo.cabinName
-            })
-          });
-        } catch (err) {
-          console.error("Failed to forward checkin webhook:", err);
-        }
+      const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+      const webhookSecret = process.env.CHECKIN_WEBHOOK_SECRET;
+      
+      try {
+        await fetch(`${operationsApiUrl}/api/checkin/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(webhookSecret ? { 'X-Checkin-Secret': webhookSecret } : {})
+          },
+          body: JSON.stringify({
+            booking_id: booking || '',
+            name: name || '',
+            email: email || '',
+            phone: phone || '',
+            timestamp: timestamp,
+            cabin_name: cabinInfo.cabinName
+          })
+        });
+      } catch (err) {
+        console.error("Failed to forward checkin webhook:", err);
       }
 
       // Return success confirmation (door codes sent separately via SMS)
