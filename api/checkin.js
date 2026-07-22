@@ -153,6 +153,18 @@ export default async function handler(req, res) {
                 return matchName && matchDate;
               });
             }
+
+            // 3. Fallback for new Airbnb codes: Match upcoming Airbnb bookings
+            if (!bookingDetails && targetCode && String(targetCode).length > 5) {
+              const todayStr = new Date().toISOString().split('T')[0];
+              const upcomingAirbnb = bookings.filter(b => 
+                b.channel && b.channel.toLowerCase().includes('airbnb') && 
+                b.check_in_date >= todayStr
+              );
+              if (upcomingAirbnb.length === 1) {
+                bookingDetails = upcomingAirbnb[0];
+              }
+            }
           }
         } catch (e) {
           console.error("Error looking up booking details:", e);
