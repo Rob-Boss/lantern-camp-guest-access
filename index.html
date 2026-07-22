@@ -688,6 +688,11 @@
         document.getElementById('checkout-time-display').textContent = `By 10:00 AM on departure day`;
       }
 
+      // Allow resetting saved state via URL parameter (e.g. ?reset=1)
+      if (urlParams.get('reset') === '1' || urlParams.get('new') === '1') {
+        localStorage.removeItem(`lantern_camp_checkin_${token}`);
+      }
+
       // Check if guest has already completed check-in previously
       const savedCheckin = localStorage.getItem(`lantern_camp_checkin_${token}`);
       if (savedCheckin) {
