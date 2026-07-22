@@ -540,13 +540,18 @@
     <!-- 4. SUCCESS VIEW -->
     <div id="view-success" class="view">
       <h1>Waiver Signed & Confirmed</h1>
-      <p class="subtitle" style="margin-bottom: 20px;">Thank You For Completing Waiver Registration</p>
+      <p class="subtitle" style="margin-bottom: 20px;">Thank You For Completing Your Liability Waiver</p>
 
       <div class="success-card">
         <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: left;">
-          <p class="code-label" style="display: flex; align-items: center; gap: 6px;">📱 ACCESS CODES VIA SMS</p>
-          <p style="font-size: 15px; color: var(--clean-birch); line-height: 1.5; margin-top: 6px;">
-            Your cabin assignment, door entry code, and gate access code will be sent to <strong id="success-phone-display" style="color: var(--amber-gold);">your phone number</strong> via SMS text message prior to check-in.
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <p class="code-label" style="display: flex; align-items: center; gap: 6px; margin: 0;">📱 ACCESS CODES VIA SMS</p>
+            <button id="btn-change-phone" style="background: none; border: none; color: var(--amber-gold); font-size: 12px; cursor: pointer; text-decoration: underline; font-weight: 600; padding: 0;">
+              &larr; Change Phone Number
+            </button>
+          </div>
+          <p style="font-size: 14.5px; color: var(--clean-birch); line-height: 1.5; margin-top: 8px;">
+            Your cabin assignment and door entry code will be sent to <strong id="success-phone-display" style="color: var(--amber-gold);">your phone number</strong> via SMS text message prior to check-in.
           </p>
         </div>
 
@@ -556,19 +561,14 @@
 
         <div class="success-instructions">
           <h4>🌲 Arrival Guidelines</h4>
-          <p><strong>Check-in:</strong> <span id="checkin-time-display">After 3:00 PM today.</span> <br><strong>Checkout:</strong> <span id="checkout-time-display">By 10:00 AM on departure day.</span></p>
+          <p><strong>Check-in:</strong> <span id="checkin-time-display">After 3:00 PM on arrival day.</span> <br><strong>Checkout:</strong> <span id="checkout-time-display">By 10:00 AM on departure day.</span></p>
           
-          <h4>📍 Directions & Parking</h4>
+          <h4>📍 Directions</h4>
           <p><strong>Google Maps:</strong> <a href="https://maps.app.goo.gl/swM7qsAG3k4tKnUG6" target="_blank" style="color: var(--amber-gold); text-decoration: underline; font-weight: 500;">Open Google Maps Directions</a><br>
-          <strong>Written Directions:</strong> Navigate to 85 Dodge Hill Rd, Orland, ME 04472. Take Dodge Hill Rd to the crest of the hill and then descend 300ft or so until you get to a gravel turnaround area. Bear right. Drive under the transmission lines and through the gate. Take your first right, about 200ft past the gate. Take the road up until you see a shingled building on your left, and a parking area on your right. Park in the parking area! If you have an EV, feel free to use one of our chargers.
-          <br><br>
-          Please park in the main guest lot. To preserve the meadow environment, vehicle access to cabins is not permitted. Carts are available at the edge of the parking lot to help transport your luggage to your cabin (1-5 minute walk).</p>
+          <strong>Written Directions:</strong> Navigate to 85 Dodge Hill Rd, Orland, ME 04472. Take Dodge Hill Rd to the crest of the hill and then descend 300ft or so until you get to a gravel turnaround area. Bear right. Drive under the transmission lines and through the gate. Take your first right, about 200ft past the gate. Take the road up until you see a shingled building on your left, and a parking area on your right. Park in the parking area!</p>
 
-          <h4>📶 Wi-Fi Access</h4>
-          <p><strong>Network:</strong> LC Orland Guest <br><strong>Password:</strong> BlueberryPie</p>
-          
           <h4>💬 Need Help?</h4>
-          <p>The GM is on-site and can be reached by reply in your message thread.</p>
+          <p>If you have any questions prior to arrival, please reply via your booking channel (Airbnb, Booking.com, etc.) or email us at <a href="mailto:info@lanterncamp.com" style="color: var(--amber-gold); text-decoration: underline;">info@lanterncamp.com</a>.</p>
         </div>
       </div>
     </div>
@@ -605,6 +605,7 @@
     const agreeWaiver = document.getElementById('agree-waiver');
     const marketingOptin = document.getElementById('marketing-optin');
     const submitBtn = document.getElementById('submit-btn');
+    const btnChangePhone = document.getElementById('btn-change-phone');
 
     // Get token from URL query parameter 't' or path
     const urlParams = new URLSearchParams(window.location.search);
@@ -628,6 +629,15 @@
     agreeWaiver.addEventListener('change', () => {
       submitBtn.disabled = !agreeWaiver.checked;
     });
+
+    // Change Phone Number button helper
+    if (btnChangePhone) {
+      btnChangePhone.addEventListener('click', () => {
+        showView('form');
+        guestPhone.focus();
+        guestPhone.select();
+      });
+    }
 
     // Helper to format Date: YYYY-MM-DD -> "Thursday, July 16"
     function formatStayDate(dateStr) {
@@ -669,9 +679,13 @@
       }
       if (checkinDate) {
         document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(checkinDate)}`;
+      } else {
+        document.getElementById('checkin-time-display').textContent = `After 3:00 PM on arrival day`;
       }
       if (checkoutDate) {
         document.getElementById('checkout-time-display').textContent = `By 10:00 AM on ${formatStayDate(checkoutDate)}`;
+      } else {
+        document.getElementById('checkout-time-display').textContent = `By 10:00 AM on departure day`;
       }
 
       // Check if guest has already completed check-in previously
