@@ -171,11 +171,14 @@ export default async function handler(req, res) {
         }
       }
 
+      const isSpecificCabin = cabins[activeToken] && cabins[activeToken].type !== 'General';
+      const displayCabinName = isSpecificCabin ? cabins[activeToken].cabinName : cabinInfo.cabinName;
+
       return res.status(200).json({
-        cabinName: (bookingDetails && bookingDetails.cabin_name) ? bookingDetails.cabin_name : cabinInfo.cabinName,
-        guestName: (bookingDetails && bookingDetails.guest_name) ? bookingDetails.guest_name : "",
-        checkinDate: (bookingDetails && bookingDetails.check_in_date) ? bookingDetails.check_in_date : "",
-        checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? bookingDetails.check_out_date : "",
+        cabinName: displayCabinName,
+        guestName: (bookingDetails && bookingDetails.guest_name) ? bookingDetails.guest_name : (qName || ""),
+        checkinDate: (bookingDetails && bookingDetails.check_in_date) ? bookingDetails.check_in_date : (qCheckin || ""),
+        checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? bookingDetails.check_out_date : (req.query.checkout || ""),
         type: cabinInfo.type
       });
     }
