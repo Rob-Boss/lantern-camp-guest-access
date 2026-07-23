@@ -59,7 +59,7 @@ async function appendRowToDrive(creds, rowData) {
   let currentContent = await getRes.text();
   // If the file is completely empty, initialize it with the header row
   if (!currentContent || currentContent.trim() === '') {
-    currentContent = "Timestamp,Token,Cabin,Email,Phone,Agreed,OptIn,Name,BookingID,CheckInDate,CheckOutDate\n";
+    currentContent = "Timestamp,BookingID,Cabin,Name,Email,Phone,Agreed,OptIn,CheckInDate,CheckOutDate\n";
   }
 
   // Format row fields for CSV safety (escaping quotes and commas)
@@ -199,14 +199,13 @@ export default async function handler(req, res) {
       const creds = getGoogleCreds();
       await appendRowToDrive(creds, [
         timestamp,
-        activeToken,
+        bookingCode || activeToken || '',
         cabinInfo.cabinName,
+        name || '',
         email,
         phone || '',
         'TRUE',
         optIn ? 'TRUE' : 'FALSE',
-        name || '',
-        booking || '',
         checkin || '',
         checkout || ''
       ]);
