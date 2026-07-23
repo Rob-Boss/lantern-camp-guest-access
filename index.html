@@ -606,9 +606,9 @@
     const submitBtn = document.getElementById('submit-btn');
     const btnChangePhone = document.getElementById('btn-change-phone');
 
-    // Get token or reservation code from URL query parameter ('code', 't', or path)
+    // Get token or reservation code from URL query parameter ('code', 'booking', 't', or path)
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('code') || urlParams.get('t') || (() => {
+    const token = urlParams.get('code') || urlParams.get('booking') || urlParams.get('t') || (() => {
       const pathToken = window.location.pathname.replace(/^\/|\/$/g, '');
       return (pathToken.length >= 5 && /^[a-zA-Z0-9]+$/.test(pathToken)) ? pathToken : null;
     })() || 'waiver';
