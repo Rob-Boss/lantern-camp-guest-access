@@ -211,7 +211,7 @@ export default async function handler(req, res) {
       ]);
 
       // Trigger Webhook to update operations portal in real-time
-      const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+      const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://lantern-analytics.vercel.app';
       const webhookSecret = process.env.CHECKIN_WEBHOOK_SECRET;
       
       try {
