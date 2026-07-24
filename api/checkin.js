@@ -122,11 +122,26 @@ export default async function handler(req, res) {
       };
     }
 
+function parseToISO(dateStr) {
+  if (!dateStr) return '';
+  const trimmed = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  const d = new Date(trimmed);
+  if (!isNaN(d.getTime())) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  return trimmed;
+}
+
     // GET Request: Retrieve cabin & booking details without revealing door code
     if (req.method === 'GET') {
       let bookingDetails = null;
       const qName = req.query.name || req.query.firstname || '';
-      const qCheckin = req.query.checkin || '';
+      const qCheckin = parseToISO(req.query.checkin || '');
+      const qCheckout = parseToISO(req.query.checkout || '');
       const targetCode = code || token || activeToken;
 
       if (targetCode || qName || qCheckin) {
@@ -137,11 +152,13 @@ export default async function handler(req, res) {
             const data = await bRes.json();
             const bookings = data.bookings || [];
             
-            // 1. Try matching by ID or notes
+            // 1. Try matching by ID, notes, or origin (SiteMinder HMXXXXXX)
             if (targetCode) {
+              const codeLower = String(targetCode).toLowerCase();
               bookingDetails = bookings.find(b => 
                 String(b.id) === String(targetCode) || 
-                (b.notes && b.notes.toLowerCase().includes(String(targetCode).toLowerCase()))
+                (b.notes && b.notes.toLowerCase().includes(codeLower)) ||
+                (b.origin && b.origin.toLowerCase().includes(codeLower))
               );
             }
             
@@ -149,7 +166,7 @@ export default async function handler(req, res) {
             if (!bookingDetails && (qName || qCheckin)) {
               bookingDetails = bookings.find(b => {
                 const matchName = qName ? (b.guest_name || '').toLowerCase().includes(qName.toLowerCase()) : true;
-                const matchDate = qCheckin ? String(b.check_in_date) === String(qCheckin) : true;
+                const matchDate = qCheckin ? parseToISO(b.check_in_date) === qCheckin : true;
                 return matchName && matchDate;
               });
             }
@@ -177,8 +194,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         cabinName: displayCabinName,
         guestName: (bookingDetails && bookingDetails.guest_name) ? bookingDetails.guest_name : (qName || ""),
-        checkinDate: (bookingDetails && bookingDetails.check_in_date) ? bookingDetails.check_in_date : (qCheckin || ""),
-        checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? bookingDetails.check_out_date : (req.query.checkout || ""),
+        checkinDate: (bookingDetails && bookingDetails.check_in_date) ? parseToISO(bookingDetails.check_in_date) : qCheckin,
+        checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? parseToISO(bookingDetails.check_out_date) : qCheckout,
         type: cabinInfo.type
       });
     }
@@ -237,8 +254,8 @@ export default async function handler(req, res) {
         phone || '',
         'TRUE',
         optIn ? 'TRUE' : 'FALSE',
-        checkinDateVal,
-        checkoutDateVal
+        parseToISO(checkinDateVal),
+        parseToISO(checkoutDateVal)
       ]);
 
       // Trigger Webhook to update operations portal in real-time
