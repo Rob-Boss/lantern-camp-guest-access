@@ -195,6 +195,37 @@ export default async function handler(req, res) {
       // Capture check-in timestamp (UTC format)
       const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
+      // Look up booking details if checkin or checkout dates are missing or incomplete
+      let checkinDateVal = checkin || '';
+      let checkoutDateVal = checkout || '';
+
+      if (!checkinDateVal || !checkoutDateVal || checkinDateVal.length < 8) {
+        try {
+          const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+          const bRes = await fetch(`${operationsApiUrl}/api/dashboard/bookings`);
+          if (bRes.ok) {
+            const data = await bRes.json();
+            const bookings = data.bookings || [];
+            const targetCode = bookingCode || code || activeToken;
+            
+            const matchedBooking = bookings.find(b => 
+              String(b.id) === String(targetCode) || 
+              (b.notes && b.notes.toLowerCase().includes(String(targetCode).toLowerCase())) ||
+              (b.origin && b.origin.toLowerCase().includes(String(targetCode).toLowerCase())) ||
+              (email && b.guest_email && b.guest_email.toLowerCase() === email.toLowerCase()) ||
+              (name && b.guest_name && b.guest_name.toLowerCase().includes(name.toLowerCase()))
+            );
+            
+            if (matchedBooking) {
+              if (!checkinDateVal || checkinDateVal.length < 8) checkinDateVal = matchedBooking.check_in_date || '';
+              if (!checkoutDateVal || checkoutDateVal.length < 8) checkoutDateVal = matchedBooking.check_out_date || '';
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching booking dates for waiver CSV:", err);
+        }
+      }
+
       // Append signature details to Google Drive CSV
       const creds = getGoogleCreds();
       await appendRowToDrive(creds, [
@@ -206,8 +237,8 @@ export default async function handler(req, res) {
         phone || '',
         'TRUE',
         optIn ? 'TRUE' : 'FALSE',
-        checkin || '',
-        checkout || ''
+        checkinDateVal,
+        checkoutDateVal
       ]);
 
       // Trigger Webhook to update operations portal in real-time

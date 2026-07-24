@@ -745,6 +745,9 @@
           guestFirstname.value = parts[0] || '';
           guestLastname.value = parts.slice(1).join(' ') || '';
         }
+        window._loadedCheckinDate = data.checkinDate || '';
+        window._loadedCheckoutDate = data.checkoutDate || '';
+
         if (data.checkinDate) {
           document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(data.checkinDate)}`;
         }
@@ -800,8 +803,8 @@
             email: email,
             optIn: optIn,
             booking: urlParams.get('booking') || '',
-            checkin: urlParams.get('checkin') || '',
-            checkout: urlParams.get('checkout') || ''
+            checkin: urlParams.get('checkin') || window._loadedCheckinDate || '',
+            checkout: urlParams.get('checkout') || window._loadedCheckoutDate || ''
           })
         });
 
