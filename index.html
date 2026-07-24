@@ -560,7 +560,7 @@
 
         <div class="success-instructions">
           <h4>🌲 Arrival Guidelines</h4>
-          <p><strong>Check-in:</strong> <span id="checkin-time-display">After 3:00 PM on arrival day.</span> <br><strong>Checkout:</strong> <span id="checkout-time-display">By 10:00 AM on departure day.</span></p>
+          <p><strong>Check-in:</strong> <span id="checkin-time-display">After 3 PM on arrival day.</span> <br><strong>Checkout:</strong> <span id="checkout-time-display">By 10 AM on departure day.</span></p>
           
           <h4>📍 Directions</h4>
           <p><strong>Google Maps:</strong> <a href="https://maps.app.goo.gl/swM7qsAG3k4tKnUG6" target="_blank" style="color: var(--amber-gold); text-decoration: underline; font-weight: 500;">Open Google Maps Directions</a><br>
@@ -685,14 +685,14 @@
         guestPhone.value = urlPhone;
       }
       if (checkinDate) {
-        document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(checkinDate)}`;
+        document.getElementById('checkin-time-display').textContent = `After 3 PM on ${formatStayDate(checkinDate)}`;
       } else {
-        document.getElementById('checkin-time-display').textContent = `After 3:00 PM on arrival day`;
+        document.getElementById('checkin-time-display').textContent = `After 3 PM on arrival day`;
       }
       if (checkoutDate) {
-        document.getElementById('checkout-time-display').textContent = `By 10:00 AM on ${formatStayDate(checkoutDate)}`;
+        document.getElementById('checkout-time-display').textContent = `By 10 AM on ${formatStayDate(checkoutDate)}`;
       } else {
-        document.getElementById('checkout-time-display').textContent = `By 10:00 AM on departure day`;
+        document.getElementById('checkout-time-display').textContent = `By 10 AM on departure day`;
       }
 
       // Allow resetting saved state via URL parameter (e.g. ?reset=1)
@@ -749,10 +749,10 @@
         window._loadedCheckoutDate = data.checkoutDate || '';
 
         if (data.checkinDate) {
-          document.getElementById('checkin-time-display').textContent = `After 3:00 PM on ${formatStayDate(data.checkinDate)}`;
+          document.getElementById('checkin-time-display').textContent = `After 3 PM on ${formatStayDate(data.checkinDate)}`;
         }
         if (data.checkoutDate) {
-          document.getElementById('checkout-time-display').textContent = `By 10:00 AM on ${formatStayDate(data.checkoutDate)}`;
+          document.getElementById('checkout-time-display').textContent = `By 10 AM on ${formatStayDate(data.checkoutDate)}`;
         }
         showView('form');
       } catch (err) {
