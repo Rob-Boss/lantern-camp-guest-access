@@ -243,20 +243,24 @@ function parseToISO(dateStr) {
         }
       }
 
-      // Append signature details to Google Drive CSV
-      const creds = getGoogleCreds();
-      await appendRowToDrive(creds, [
-        timestamp,
-        bookingCode || activeToken || '',
-        cabinInfo.cabinName,
-        name || '',
-        email,
-        phone || '',
-        'TRUE',
-        optIn ? 'TRUE' : 'FALSE',
-        parseToISO(checkinDateVal),
-        parseToISO(checkoutDateVal)
-      ]);
+      // Append signature details to Google Drive CSV (non-blocking backup)
+      try {
+        const creds = getGoogleCreds();
+        await appendRowToDrive(creds, [
+          timestamp,
+          bookingCode || activeToken || '',
+          cabinInfo.cabinName,
+          name || '',
+          email,
+          phone || '',
+          'TRUE',
+          optIn ? 'TRUE' : 'FALSE',
+          parseToISO(checkinDateVal),
+          parseToISO(checkoutDateVal)
+        ]);
+      } catch (driveErr) {
+        console.error("Failed to append waiver signature to Google Drive CSV backup:", driveErr.message || driveErr);
+      }
 
       // Trigger Webhook to update operations portal in real-time
       const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
