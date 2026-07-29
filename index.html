@@ -655,6 +655,21 @@
       return dateStr;
     }
 
+    function lockNameFields() {
+      if (guestFirstname.value.trim()) {
+        guestFirstname.readOnly = true;
+        guestFirstname.style.backgroundColor = '#edf2f7';
+        guestFirstname.style.color = '#2d3748';
+        guestFirstname.style.cursor = 'not-allowed';
+      }
+      if (guestLastname.value.trim()) {
+        guestLastname.readOnly = true;
+        guestLastname.style.backgroundColor = '#edf2f7';
+        guestLastname.style.color = '#2d3748';
+        guestLastname.style.cursor = 'not-allowed';
+      }
+    }
+
     async function initCheckin() {
       // Customize greeting and pre-fill form fields if parameters are present in URL
       const urlName = urlParams.get('name');
@@ -672,11 +687,13 @@
         if (displayName) {
           document.getElementById('welcome-title').textContent = `Welcome, ${displayName}!`;
         }
+        lockNameFields();
       } else if (urlName) {
         document.getElementById('welcome-title').textContent = `Welcome, ${urlName}!`;
         const parts = urlName.trim().split(' ');
         guestFirstname.value = parts[0] || '';
         guestLastname.value = parts.slice(1).join(' ') || '';
+        lockNameFields();
       }
       if (urlEmail) {
         guestEmail.value = urlEmail;
@@ -744,6 +761,7 @@
           const parts = data.guestName.trim().split(' ');
           guestFirstname.value = parts[0] || '';
           guestLastname.value = parts.slice(1).join(' ') || '';
+          lockNameFields();
         }
         window._loadedCheckinDate = data.checkinDate || '';
         window._loadedCheckoutDate = data.checkoutDate || '';
