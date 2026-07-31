@@ -524,6 +524,13 @@
         </div>
 
         <div class="checkbox-group">
+          <input type="checkbox" id="bringing-pet">
+          <label for="bringing-pet">
+            🐾 I am bringing a dog/pet to Lantern Camp (optional — $59 pet fee per stay).
+          </label>
+        </div>
+
+        <div class="checkbox-group">
           <input type="checkbox" id="marketing-optin" checked>
           <label for="marketing-optin">
             Yes, keep me updated on news, seasonal offers, and events at Lantern Camp (optional).
@@ -795,6 +802,7 @@
       const phone = guestPhone.value.trim();
       const email = guestEmail.value.trim();
       const optIn = marketingOptin.checked;
+      const bringingPet = document.getElementById('bringing-pet') ? document.getElementById('bringing-pet').checked : false;
 
       if (!firstName || !lastName || !phone || !email || !agreeWaiver.checked) {
         alert("Please provide your first name, last name, phone number, email address, and agree to the waiver terms.");
@@ -820,6 +828,8 @@
             phone: phone,
             email: email,
             optIn: optIn,
+            has_pet: bringingPet,
+            bringing_pet: bringingPet,
             booking: urlParams.get('booking') || '',
             checkin: urlParams.get('checkin') || window._loadedCheckinDate || '',
             checkout: urlParams.get('checkout') || window._loadedCheckoutDate || ''

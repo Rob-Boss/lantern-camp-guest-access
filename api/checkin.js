@@ -202,7 +202,8 @@ function parseToISO(dateStr) {
 
     // POST Request: Agree to waiver, save contact details, and notify operations
     if (req.method === 'POST') {
-      const { email, phone, optIn, name, booking, checkin, checkout } = body;
+      const { email, phone, optIn, name, booking, checkin, checkout, has_pet, bringing_pet } = body;
+      const hasPet = Boolean(has_pet || bringing_pet);
       const bookingCode = booking || code || activeToken || '';
       
       if (!email || !phone) {
@@ -279,7 +280,9 @@ function parseToISO(dateStr) {
             email: email || '',
             phone: phone || '',
             timestamp: timestamp,
-            cabin_name: cabinInfo.cabinName
+            cabin_name: cabinInfo.cabinName,
+            has_pet: hasPet,
+            bringing_pet: hasPet
           })
         });
       } catch (err) {
