@@ -423,7 +423,7 @@
                 🔐 Private Session Window (7am – 4pm)
               </div>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 10px 0;">
-                Bookable private 50-minute sessions for your cabin. Please vacate at 10 minutes to the hour. You may include other Lantern Camp guests at your discretion (no off-site guests).
+                Bookable private 50-minute sessions for your cabin (booked by primary guest). All cabin guests and invited Lantern Camp guests are welcome to join (no off-site guests). Please vacate at 10 minutes to the hour.
               </p>
             </div>
             <div style="font-size: 12px; color: var(--forest-green); font-weight: 700; font-style: italic;">
@@ -488,22 +488,14 @@
 
         <!-- Guest Booking Form -->
         <div id="booking-form-wrap" class="booking-form" style="display: none;">
-          <h2 id="selected-slot-title" style="font-size: 14px; font-weight: 700; color: var(--forest-green); margin-bottom: 12px;"></h2>
+          <h2 id="selected-slot-title" style="font-size: 15px; font-weight: 800; color: var(--forest-green); margin-bottom: 8px;"></h2>
           
-          <div class="controls-grid">
-            <div class="form-group">
-              <label class="label">Your Name *</label>
-              <input type="text" id="guest-name" class="input" placeholder="e.g. Eric Ornstein" required>
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 13px; color: var(--text-primary);">
+            <div style="margin-bottom: 4px;">🏡 <strong>Reservation:</strong> <span id="confirm-cabin-name">Forest Cabin 1</span></div>
+            <div style="margin-bottom: 4px;">👤 <strong>Primary Guest:</strong> <span id="confirm-guest-name">Guest</span></div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e5e7eb;">
+              ℹ️ Billed to your stay folio. Anyone staying in your cabin and invited Lantern Camp guests are welcome to join your session!
             </div>
-            <div class="form-group">
-              <label class="label">Email Address (For Reminders)</label>
-              <input type="email" id="guest-email" class="input" placeholder="e.g. eric@example.com">
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top: 10px;">
-            <label class="label">Phone Number (Optional)</label>
-            <input type="tel" id="guest-phone" class="input" placeholder="(555) 000-0000">
           </div>
 
           <div class="rules-box">
@@ -698,6 +690,8 @@
                 display_label: `${day.display_date} @ ${slot.display_label}`
               };
               document.getElementById('selected-slot-title').innerText = `Confirm Reservation for ${selectedSlotObj.display_label}`;
+              document.getElementById('confirm-cabin-name').innerText = cabinParam;
+              document.getElementById('confirm-guest-name').innerText = guestFullName;
               document.getElementById('booking-form-wrap').style.display = 'block';
               document.getElementById('booking-form-wrap').scrollIntoView({ behavior: 'smooth' });
             });
@@ -720,13 +714,12 @@
 
     document.getElementById('btn-submit').addEventListener('click', async () => {
       if (!selectedSlotObj) return alert('Please select a time slot.');
-      const name = document.getElementById('guest-name').value.trim();
-      if (!name) return alert('Please enter your name.');
       const agreed = document.getElementById('rules-check').checked;
       if (!agreed) return alert('Please confirm that you agree to the sauna safety guidelines.');
 
-      const email = document.getElementById('guest-email').value.trim();
-      const phone = document.getElementById('guest-phone').value.trim();
+      const name = guestFullName;
+      const email = urlParams.get('email') || '';
+      const phone = urlParams.get('phone') || '';
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
