@@ -119,6 +119,27 @@
       line-height: 1.45;
     }
 
+    .res-banner {
+      background: #f0f4f1;
+      border: 1px solid #cce0d2;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .res-banner-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-primary);
+    }
+
     .controls-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -132,6 +153,10 @@
       }
       .hero-image-wrap {
         height: 200px;
+      }
+      .res-banner {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
 
@@ -166,22 +191,16 @@
       box-shadow: 0 0 0 2px rgba(45, 74, 62, 0.1);
     }
 
-    .section-title-row {
+    .day-section-header {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--forest-green);
+      margin: 18px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid var(--sage-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .section-title-row h2 {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--forest-green);
-    }
-
-    .section-title-row span {
-      font-size: 11px;
-      color: var(--text-secondary);
     }
 
     .slots-grid {
@@ -250,7 +269,7 @@
     }
 
     .communal-card {
-      margin-top: 14px;
+      margin-top: 18px;
       padding: 12px 14px;
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -409,47 +428,19 @@
 
       <!-- Booking Timetable Section (Opened via button or direct scroll) -->
       <div id="timetable-section" style="display: none; padding-top: 16px; border-top: 1px dashed #d1d5db;">
-        <!-- Date & Cabin Controls -->
-        <div class="controls-grid">
-          <div class="form-group">
-            <label class="label">📅 Date of Session</label>
-            <input type="date" id="session-date" class="input">
-          </div>
-          <div class="form-group">
-            <label class="label">🏡 Your Cabin</label>
-            <select id="cabin-select" class="select">
-              <option value="Forest 1">Forest Cabin 1</option>
-              <option value="Forest 2">Forest Cabin 2</option>
-              <option value="Forest 3">Forest Cabin 3</option>
-              <option value="Forest 4">Forest Cabin 4</option>
-              <option value="Forest 5">Forest Cabin 5</option>
-              <option value="Forest 6">Forest Cabin 6</option>
-              <option value="Forest 7">Forest Cabin 7</option>
-              <option value="Forest 8">Forest Cabin 8</option>
-              <option value="Forest 9">Forest Cabin 9</option>
-              <option value="Forest 10">Forest Cabin 10</option>
-              <option value="Forest 11">Forest Cabin 11</option>
-              <option value="Forest 12">Forest Cabin 12</option>
-              <option value="Field 1">Field Cabin 1</option>
-              <option value="Field 2">Field Cabin 2</option>
-              <option value="Field 3">Field Cabin 3</option>
-              <option value="Field 4">Field Cabin 4</option>
-              <option value="Field 5">Field Cabin 5</option>
-              <option value="Field 6">Field Cabin 6</option>
-              <option value="Field 7">Field Cabin 7</option>
-              <option value="Field 8">Field Cabin 8</option>
-              <option value="Field 9">Field Cabin 9</option>
-              <option value="Field 10">Field Cabin 10</option>
-              <option value="Field 11">Field Cabin 11</option>
-              <option value="Field 12">Field Cabin 12</option>
-            </select>
-          </div>
+        
+        <!-- Guest Reservation Context Banner -->
+        <div class="res-banner">
+          <div class="res-banner-item">👤 <strong>Guest:</strong> <span id="banner-guest-name">Guest</span></div>
+          <div class="res-banner-item">🏡 <strong>Cabin:</strong> <span id="banner-cabin-name">Forest Cabin 1</span></div>
+          <div class="res-banner-item">📅 <strong>Stay Window:</strong> <span id="banner-stay-dates">Active Stay</span></div>
         </div>
 
-        <!-- Slot Picker Section -->
-        <div class="section-title-row">
-          <h2>Select Private Time Slot (50 min)</h2>
-          <span>7:00 AM – 4:00 PM</span>
+        <div id="timetable-header-row" style="margin-bottom: 12px;">
+          <h2 style="font-size: 15px; font-weight: 800; color: var(--forest-green);">Available Private Time Slots</h2>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+            Private sessions run hourly (Check-in 3:00 PM through Departure 9:00 AM).
+          </p>
         </div>
 
         <div id="slots-container">
@@ -528,39 +519,28 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    const dateInput = document.getElementById('session-date');
     const todayStr = getTodayStr();
-    dateInput.value = todayStr;
-    dateInput.min = todayStr;
 
-    // Auto fill & restrict stay date range from query params
+    // Parse reservation query params from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const checkinParam = urlParams.get('checkin') || urlParams.get('arrival') || urlParams.get('start');
-    const checkoutParam = urlParams.get('checkout') || urlParams.get('departure') || urlParams.get('end');
+    const checkinParam = urlParams.get('checkin') || urlParams.get('arrival') || urlParams.get('start') || todayStr;
+    const checkoutParam = urlParams.get('checkout') || urlParams.get('departure') || urlParams.get('end') || todayStr;
+    const cabinParam = urlParams.get('cabin') || 'Forest 1';
 
-    if (checkinParam) {
-      if (checkinParam >= todayStr) {
-        dateInput.min = checkinParam;
-        dateInput.value = checkinParam;
-      } else {
-        dateInput.min = todayStr;
-      }
-    }
-    if (checkoutParam) {
-      dateInput.max = checkoutParam;
-    }
-
+    let guestFullName = 'Guest';
     if (urlParams.get('firstname') || urlParams.get('name')) {
       const fn = urlParams.get('firstname') || '';
       const ln = urlParams.get('lastname') || '';
-      const full = (fn + ' ' + ln).trim() || urlParams.get('name') || '';
-      document.getElementById('guest-name').value = full;
+      guestFullName = (fn + ' ' + ln).trim() || urlParams.get('name') || 'Guest';
+      document.getElementById('guest-name').value = guestFullName;
     }
     if (urlParams.get('email')) document.getElementById('guest-email').value = urlParams.get('email');
     if (urlParams.get('phone')) document.getElementById('guest-phone').value = urlParams.get('phone');
-    if (urlParams.get('cabin')) {
-      document.getElementById('cabin-select').value = urlParams.get('cabin');
-    }
+
+    // Populate Context Banner
+    document.getElementById('banner-guest-name').innerText = guestFullName;
+    document.getElementById('banner-cabin-name').innerText = cabinParam;
+    document.getElementById('banner-stay-dates').innerText = `${checkinParam} to ${checkoutParam}`;
 
     // Handle "Book a Private Session" button click
     const btnShowTimetable = document.getElementById('btn-show-timetable');
@@ -570,10 +550,10 @@
       timetableSection.style.display = 'block';
       btnShowTimetable.style.display = 'none';
       timetableSection.scrollIntoView({ behavior: 'smooth' });
-      loadAvailability(dateInput.value);
+      loadStayAvailability();
     });
 
-    async function loadAvailability(dateStr) {
+    async function loadStayAvailability() {
       const container = document.getElementById('slots-container');
       const formWrap = document.getElementById('booking-form-wrap');
       formWrap.style.display = 'none';
@@ -581,75 +561,97 @@
 
       container.innerHTML = '<div class="spinner"></div>';
       try {
-        const res = await fetch(`${API_BASE}/api/sauna/availability?date=${dateStr}`);
+        const res = await fetch(`${API_BASE}/api/sauna/availability?checkin=${checkinParam}&checkout=${checkoutParam}`);
         if (!res.ok) throw new Error('Failed to fetch availability');
         const json = await res.json();
-        renderSlots(json.slots || [], dateStr);
+        
+        if (json.days && json.days.length > 0) {
+          renderRangeDays(json.days);
+        } else if (json.slots) {
+          renderSingleDay(json.slots, json.date || todayStr);
+        }
       } catch (err) {
+        console.error(err);
         container.innerHTML = '<div style="color: #991b1b; padding: 12px; background: #fee2e2; border-radius: 6px; font-size: 13px;">Unable to load sauna availability. Please check your connection.</div>';
       }
     }
 
-    function renderSlots(slots, dateStr) {
+    function renderRangeDays(days) {
       const container = document.getElementById('slots-container');
-      if (slots.length === 0) {
-        container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">No slots available for this date.</div>';
-        return;
-      }
+      container.innerHTML = '';
 
-      let html = '<div class="slots-grid">';
-      slots.forEach(slot => {
-        let isAvailable = slot.status === 'available';
-        const isBooked = slot.status === 'booked';
+      days.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'day-section-header';
+        dayHeader.innerHTML = `
+          <span>${day.display_date}</span>
+          <span style="font-size: 11px; font-weight: 500; color: var(--text-secondary);">7:00 AM – 4:00 PM</span>
+        `;
+        container.appendChild(dayHeader);
 
-        let badgeLabel = 'Available';
-        let badgeClass = 'badge-available';
+        const grid = document.createElement('div');
+        grid.className = 'slots-grid';
 
-        // Check if selected date is checkout day (limit to slots starting before 9am)
-        if (checkoutParam && dateStr === checkoutParam && slot.start_time >= '09:00') {
-          isAvailable = false;
-          badgeLabel = 'After Checkout';
-          badgeClass = 'badge-leadtime';
-        } else if (isBooked) {
-          isAvailable = false;
-          badgeLabel = `Booked (${slot.booked_by_cabin || 'Occupied'})`;
-          badgeClass = 'badge-booked';
-        } else if (!isAvailable) {
-          badgeLabel = 'Unavailable';
-          badgeClass = 'badge-leadtime';
-        }
+        day.slots.forEach(slot => {
+          const isAvailable = slot.status === 'available';
+          const isBooked = slot.status === 'booked';
 
-        const disabledAttr = !isAvailable ? 'disabled' : '';
+          let badgeLabel = 'Available';
+          let badgeClass = 'badge-available';
 
-        html += `
-          <button type="button" class="slot-btn" ${disabledAttr} data-time="${slot.start_time}" data-label="${slot.display_label}">
+          if (isBooked) {
+            badgeLabel = `Booked (${slot.booked_by_cabin || 'Occupied'})`;
+            badgeClass = 'badge-booked';
+          } else if (!isAvailable) {
+            badgeLabel = 'Unavailable';
+            badgeClass = 'badge-leadtime';
+          }
+
+          const disabledAttr = !isAvailable ? 'disabled' : '';
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'slot-btn';
+          if (!isAvailable) btn.disabled = true;
+          btn.setAttribute('data-date', day.date);
+          btn.setAttribute('data-time', slot.start_time);
+          btn.setAttribute('data-label', slot.display_label);
+          btn.setAttribute('data-daytitle', day.display_date);
+
+          btn.innerHTML = `
             <span class="slot-time">${slot.display_label}</span>
             <span class="slot-badge ${badgeClass}">${badgeLabel}</span>
-          </button>
-        `;
-      });
-      html += '</div>';
-      container.innerHTML = html;
+          `;
 
-      // Attach click events
-      container.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
-        btn.addEventListener('click', () => {
-          container.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          selectedSlotObj = {
-            start_time: btn.getAttribute('data-time'),
-            display_label: btn.getAttribute('data-label')
-          };
-          document.getElementById('selected-slot-title').innerText = `Confirm Reservation for ${selectedSlotObj.display_label}`;
-          document.getElementById('booking-form-wrap').style.display = 'block';
-          document.getElementById('booking-form-wrap').scrollIntoView({ behavior: 'smooth' });
+          if (isAvailable) {
+            btn.addEventListener('click', () => {
+              container.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+              btn.classList.add('selected');
+              selectedSlotObj = {
+                date: day.date,
+                start_time: slot.start_time,
+                display_label: `${day.display_date} @ ${slot.display_label}`
+              };
+              document.getElementById('selected-slot-title').innerText = `Confirm Reservation for ${selectedSlotObj.display_label}`;
+              document.getElementById('booking-form-wrap').style.display = 'block';
+              document.getElementById('booking-form-wrap').scrollIntoView({ behavior: 'smooth' });
+            });
+          }
+
+          grid.appendChild(btn);
         });
+
+        container.appendChild(grid);
       });
     }
 
-    dateInput.addEventListener('change', (e) => {
-      if (e.target.value) loadAvailability(e.target.value);
-    });
+    function renderSingleDay(slots, dateStr) {
+      renderRangeDays([{
+        date: dateStr,
+        display_date: dateStr,
+        slots: slots
+      }]);
+    }
 
     document.getElementById('btn-submit').addEventListener('click', async () => {
       if (!selectedSlotObj) return alert('Please select a time slot.');
@@ -658,8 +660,6 @@
       const agreed = document.getElementById('rules-check').checked;
       if (!agreed) return alert('Please confirm that you agree to the sauna safety guidelines.');
 
-      const dateStr = dateInput.value;
-      const cabin = document.getElementById('cabin-select').value;
       const email = document.getElementById('guest-email').value.trim();
       const phone = document.getElementById('guest-phone').value.trim();
 
@@ -672,20 +672,20 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            session_date: dateStr,
+            session_date: selectedSlotObj.date,
             start_time: selectedSlotObj.start_time,
             guest_name: name,
             guest_email: email,
             guest_phone: phone,
-            cabin_name: cabin
+            cabin_name: cabinParam
           })
         });
 
         const json = await res.json();
         if (res.ok && json.status === 'success') {
-          document.getElementById('succ-date').innerText = dateStr;
+          document.getElementById('succ-date').innerText = selectedSlotObj.date;
           document.getElementById('succ-time').innerText = selectedSlotObj.display_label;
-          document.getElementById('succ-cabin').innerText = cabin;
+          document.getElementById('succ-cabin').innerText = cabinParam;
           document.getElementById('succ-name').innerText = name;
 
           document.getElementById('main-view').style.display = 'none';
