@@ -40,39 +40,83 @@
 
     .container {
       width: 100%;
-      max-width: 640px;
+      max-width: 660px;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       box-shadow: 0 4px 20px rgba(45, 74, 62, 0.06);
       padding: 24px;
+      overflow: hidden;
     }
 
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 16px;
+    .hero-image-wrap {
+      width: 100%;
+      height: 260px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 20px;
+      position: relative;
+      background-color: #1e293b;
+    }
+
+    .hero-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+      padding: 20px 18px 14px 18px;
+      color: #ffffff;
+    }
+
+    .hero-overlay h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .hero-overlay p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+      margin-top: 2px;
+    }
+
+    .info-card {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
       margin-bottom: 20px;
     }
 
-    .header-icon {
-      font-size: 36px;
-      line-height: 1;
-    }
-
-    .header h1 {
-      font-size: 20px;
-      font-weight: 800;
+    .info-card h3 {
+      font-size: 14px;
+      font-weight: 700;
       color: var(--forest-green);
-      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .header p {
-      font-size: 13px;
+    .rules-list {
+      font-size: 12.5px;
       color: var(--text-secondary);
-      margin-top: 2px;
+      padding-left: 18px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      line-height: 1.45;
     }
 
     .controls-grid {
@@ -85,6 +129,9 @@
     @media (max-width: 480px) {
       .controls-grid {
         grid-template-columns: 1fr;
+      }
+      .hero-image-wrap {
+        height: 200px;
       }
     }
 
@@ -198,8 +245,8 @@
     }
 
     .badge-leadtime {
-      background: #fef3c7;
-      color: #b45309;
+      background: #e5e7eb;
+      color: #6b7280;
     }
 
     .communal-card {
@@ -330,107 +377,118 @@
   <div class="container">
     <!-- Main Content Area -->
     <div id="main-view">
-      <div class="header">
-        <div class="header-icon">🪵</div>
-        <div>
+      
+      <!-- Hero Image Banner -->
+      <div class="hero-image-wrap">
+        <img 
+          src="https://lantern-digital-press-kit.vercel.app/assets/01_Hero_Shots/sauna_interior_153.jpg" 
+          alt="Lantern Camp Wood-Fired Sauna Interior"
+        >
+        <div class="hero-overlay">
           <h1>Wood-Fired Sauna Experience</h1>
-          <p>Reserve private 50-minute sessions (7:00 AM – 4:00 PM)</p>
+          <p>Relax and restore in our custom wood-fired cedar sauna.</p>
         </div>
       </div>
 
-      <!-- Date & Cabin Controls -->
-      <div class="controls-grid">
-        <div class="form-group">
-          <label class="label">📅 Date of Session</label>
-          <input type="date" id="session-date" class="input">
-        </div>
-        <div class="form-group">
-          <label class="label">🏡 Your Cabin</label>
-          <select id="cabin-select" class="select">
-            <option value="Forest 1">Forest Cabin 1</option>
-            <option value="Forest 2">Forest Cabin 2</option>
-            <option value="Forest 3">Forest Cabin 3</option>
-            <option value="Forest 4">Forest Cabin 4</option>
-            <option value="Forest 5">Forest Cabin 5</option>
-            <option value="Forest 6">Forest Cabin 6</option>
-            <option value="Forest 7">Forest Cabin 7</option>
-            <option value="Forest 8">Forest Cabin 8</option>
-            <option value="Forest 9">Forest Cabin 9</option>
-            <option value="Forest 10">Forest Cabin 10</option>
-            <option value="Forest 11">Forest Cabin 11</option>
-            <option value="Forest 12">Forest Cabin 12</option>
-            <option value="Field 1">Field Cabin 1</option>
-            <option value="Field 2">Field Cabin 2</option>
-            <option value="Field 3">Field Cabin 3</option>
-            <option value="Field 4">Field Cabin 4</option>
-            <option value="Field 5">Field Cabin 5</option>
-            <option value="Field 6">Field Cabin 6</option>
-            <option value="Field 7">Field Cabin 7</option>
-            <option value="Field 8">Field Cabin 8</option>
-            <option value="Field 9">Field Cabin 9</option>
-            <option value="Field 10">Field Cabin 10</option>
-            <option value="Field 11">Field Cabin 11</option>
-            <option value="Field 12">Field Cabin 12</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Sauna Guidelines & Rules Card -->
-      <div style="background: #fafafa; border: 1px solid #e5e7eb; border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px;">
-        <h3 style="font-size: 13px; font-weight: 700; color: var(--forest-green); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-          <span>♨️</span> Sauna Guidelines & Etiquette
-        </h3>
-        <ul style="font-size: 12px; color: var(--text-secondary); padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 5px; line-height: 1.45;">
+      <!-- Information & Guidelines Card (Shown First) -->
+      <div class="info-card">
+        <h3><span>♨️</span> Sauna Information & Guidelines</h3>
+        <ul class="rules-list">
           <li><strong>Private Session Window (7am–4pm):</strong> Bookable private 50 minute sessions. Please vacate at 10 min to the hour. Clothing Optional. You may include other Lantern Camp guests at your discretion, but please no off-site guests.</li>
           <li><strong>Automated Preheat:</strong> The wood-fired sauna preheats automatically so it is hot and ready for your reserved slot.</li>
           <li><strong>Hydration & Towels:</strong> Please sit on a clean towel on wooden benches and drink plenty of water.</li>
-          <li><strong>Safety Rules:</strong> Glass containers, alcohol, and open flames are strictly prohibited inside the sauna.</li>
+          <li><strong>Safety Regulations:</strong> Glass containers, alcohol, and open flames are strictly prohibited inside the sauna structure.</li>
           <li><strong>Communal Hours (4pm onwards):</strong> Open communal access for all camp guests without reservations needed.</li>
         </ul>
       </div>
 
-      <!-- Slot Picker Section -->
-      <div class="section-title-row">
-        <h2>Select Private Time Slot (50 min)</h2>
-        <span>7:00 AM – 4:00 PM</span>
-      </div>
+      <!-- Action Button to Open Booking Timetable -->
+      <button id="btn-show-timetable" type="button" class="btn-submit" style="margin-bottom: 24px;">
+        🔥 Book a Private Session
+      </button>
 
-      <div id="slots-container">
-        <div class="spinner"></div>
-      </div>
-
-      <div class="communal-card">
-        👥 <strong>Open Communal Hours (4:00 PM Onwards):</strong> No reservation needed after 4:00 PM. The wood-fired sauna is open for all camp guests to enjoy together!
-      </div>
-
-      <!-- Guest Booking Form -->
-      <div id="booking-form-wrap" class="booking-form" style="display: none;">
-        <h2 id="selected-slot-title" style="font-size: 14px; font-weight: 700; color: var(--forest-green); margin-bottom: 12px;"></h2>
-        
+      <!-- Booking Timetable Section (Opened via button or direct scroll) -->
+      <div id="timetable-section" style="display: none; padding-top: 16px; border-top: 1px dashed #d1d5db;">
+        <!-- Date & Cabin Controls -->
         <div class="controls-grid">
           <div class="form-group">
-            <label class="label">Your Name *</label>
-            <input type="text" id="guest-name" class="input" placeholder="e.g. Eric Ornstein" required>
+            <label class="label">📅 Date of Session</label>
+            <input type="date" id="session-date" class="input">
           </div>
           <div class="form-group">
-            <label class="label">Email Address (For Reminders)</label>
-            <input type="email" id="guest-email" class="input" placeholder="e.g. eric@example.com">
+            <label class="label">🏡 Your Cabin</label>
+            <select id="cabin-select" class="select">
+              <option value="Forest 1">Forest Cabin 1</option>
+              <option value="Forest 2">Forest Cabin 2</option>
+              <option value="Forest 3">Forest Cabin 3</option>
+              <option value="Forest 4">Forest Cabin 4</option>
+              <option value="Forest 5">Forest Cabin 5</option>
+              <option value="Forest 6">Forest Cabin 6</option>
+              <option value="Forest 7">Forest Cabin 7</option>
+              <option value="Forest 8">Forest Cabin 8</option>
+              <option value="Forest 9">Forest Cabin 9</option>
+              <option value="Forest 10">Forest Cabin 10</option>
+              <option value="Forest 11">Forest Cabin 11</option>
+              <option value="Forest 12">Forest Cabin 12</option>
+              <option value="Field 1">Field Cabin 1</option>
+              <option value="Field 2">Field Cabin 2</option>
+              <option value="Field 3">Field Cabin 3</option>
+              <option value="Field 4">Field Cabin 4</option>
+              <option value="Field 5">Field Cabin 5</option>
+              <option value="Field 6">Field Cabin 6</option>
+              <option value="Field 7">Field Cabin 7</option>
+              <option value="Field 8">Field Cabin 8</option>
+              <option value="Field 9">Field Cabin 9</option>
+              <option value="Field 10">Field Cabin 10</option>
+              <option value="Field 11">Field Cabin 11</option>
+              <option value="Field 12">Field Cabin 12</option>
+            </select>
           </div>
         </div>
 
-        <div class="form-group" style="margin-top: 10px;">
-          <label class="label">Phone Number (Optional)</label>
-          <input type="tel" id="guest-phone" class="input" placeholder="(555) 000-0000">
+        <!-- Slot Picker Section -->
+        <div class="section-title-row">
+          <h2>Select Private Time Slot (50 min)</h2>
+          <span>7:00 AM – 4:00 PM</span>
         </div>
 
-        <div class="rules-box">
-          <input type="checkbox" id="rules-check">
-          <label for="rules-check">
-            I agree to the <strong>Wood-Fired Sauna Etiquette & Safety Notice</strong> (hydrate, limit private sessions to 50 minutes, and exercise care around the wood stove).
-          </label>
+        <div id="slots-container">
+          <div class="spinner"></div>
         </div>
 
-        <button id="btn-submit" class="btn-submit" type="button">Confirm Private Sauna Reservation</button>
+        <div class="communal-card">
+          👥 <strong>Open Communal Hours (4:00 PM Onwards):</strong> No reservation needed after 4:00 PM. The wood-fired sauna is open for all camp guests to enjoy together!
+        </div>
+
+        <!-- Guest Booking Form -->
+        <div id="booking-form-wrap" class="booking-form" style="display: none;">
+          <h2 id="selected-slot-title" style="font-size: 14px; font-weight: 700; color: var(--forest-green); margin-bottom: 12px;"></h2>
+          
+          <div class="controls-grid">
+            <div class="form-group">
+              <label class="label">Your Name *</label>
+              <input type="text" id="guest-name" class="input" placeholder="e.g. Eric Ornstein" required>
+            </div>
+            <div class="form-group">
+              <label class="label">Email Address (For Reminders)</label>
+              <input type="email" id="guest-email" class="input" placeholder="e.g. eric@example.com">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="label">Phone Number (Optional)</label>
+            <input type="tel" id="guest-phone" class="input" placeholder="(555) 000-0000">
+          </div>
+
+          <div class="rules-box">
+            <input type="checkbox" id="rules-check">
+            <label for="rules-check">
+              I agree to the <strong>Wood-Fired Sauna Etiquette & Safety Notice</strong> (hydrate, limit private sessions to 50 minutes, and exercise care around the wood stove).
+            </label>
+          </div>
+
+          <button id="btn-submit" class="btn-submit" type="button">Confirm Private Sauna Reservation</button>
+        </div>
       </div>
     </div>
 
@@ -503,6 +561,17 @@
     if (urlParams.get('cabin')) {
       document.getElementById('cabin-select').value = urlParams.get('cabin');
     }
+
+    // Handle "Book a Private Session" button click
+    const btnShowTimetable = document.getElementById('btn-show-timetable');
+    const timetableSection = document.getElementById('timetable-section');
+
+    btnShowTimetable.addEventListener('click', () => {
+      timetableSection.style.display = 'block';
+      btnShowTimetable.style.display = 'none';
+      timetableSection.scrollIntoView({ behavior: 'smooth' });
+      loadAvailability(dateInput.value);
+    });
 
     async function loadAvailability(dateStr) {
       const container = document.getElementById('slots-container');
@@ -632,9 +701,6 @@
         btn.innerText = 'Confirm Private Sauna Reservation';
       }
     });
-
-    // Initial load
-    loadAvailability(dateInput.value);
   </script>
 </body>
 </html>
