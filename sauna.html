@@ -537,10 +537,40 @@
     if (urlParams.get('email')) document.getElementById('guest-email').value = urlParams.get('email');
     if (urlParams.get('phone')) document.getElementById('guest-phone').value = urlParams.get('phone');
 
+    function formatDateNatural(dateStr) {
+      if (!dateStr || dateStr.length < 10) return dateStr;
+      const parts = dateStr.split('-');
+      if (parts.length < 3) return dateStr;
+      const yyyy = parts[0];
+      const mm = parseInt(parts[1], 10) - 1;
+      const dd = parseInt(parts[2], 10);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${months[mm]} ${dd}, ${yyyy}`;
+    }
+
+    function formatStayRange(checkinStr, checkoutStr) {
+      if (!checkinStr || !checkoutStr) return 'Active Stay';
+      const cIn = checkinStr.split('-');
+      const cOut = checkoutStr.split('-');
+      if (cIn.length < 3 || cOut.length < 3) return `${checkinStr} – ${checkoutStr}`;
+      
+      const mmIn = parseInt(cIn[1], 10) - 1;
+      const ddIn = parseInt(cIn[2], 10);
+      const mmOut = parseInt(cOut[1], 10) - 1;
+      const ddOut = parseInt(cOut[2], 10);
+      const yyyy = cOut[0];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      if (mmIn === mmOut) {
+        return `${months[mmIn]} ${ddIn} – ${ddOut}, ${yyyy}`;
+      }
+      return `${months[mmIn]} ${ddIn} – ${months[mmOut]} ${ddOut}, ${yyyy}`;
+    }
+
     // Populate Context Banner
     document.getElementById('banner-guest-name').innerText = guestFullName;
     document.getElementById('banner-cabin-name').innerText = cabinParam;
-    document.getElementById('banner-stay-dates').innerText = `${checkinParam} to ${checkoutParam}`;
+    document.getElementById('banner-stay-dates').innerText = formatStayRange(checkinParam, checkoutParam);
 
     // Handle "Book a Private Session" button click
     const btnShowTimetable = document.getElementById('btn-show-timetable');
@@ -683,7 +713,7 @@
 
         const json = await res.json();
         if (res.ok && json.status === 'success') {
-          document.getElementById('succ-date').innerText = selectedSlotObj.date;
+          document.getElementById('succ-date').innerText = formatDateNatural(selectedSlotObj.date);
           document.getElementById('succ-time').innerText = selectedSlotObj.display_label;
           document.getElementById('succ-cabin').innerText = cabinParam;
           document.getElementById('succ-name').innerText = name;
