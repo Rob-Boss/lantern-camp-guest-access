@@ -559,10 +559,7 @@
       const fn = urlParams.get('firstname') || '';
       const ln = urlParams.get('lastname') || '';
       guestFullName = (fn + ' ' + ln).trim() || urlParams.get('name') || 'Guest';
-      document.getElementById('guest-name').value = guestFullName;
     }
-    if (urlParams.get('email')) document.getElementById('guest-email').value = urlParams.get('email');
-    if (urlParams.get('phone')) document.getElementById('guest-phone').value = urlParams.get('phone');
 
     function formatDateNatural(dateStr) {
       if (!dateStr || dateStr.length < 10) return dateStr;
