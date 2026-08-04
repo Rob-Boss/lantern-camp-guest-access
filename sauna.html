@@ -434,7 +434,7 @@
       </div>
 
       <div class="notice-box">
-        🔥 <strong>Stoking Notice:</strong> Camp staff will begin stoking the wood stove 2 hours prior to your session so the sauna reaches peak temperature!
+        🔥 <strong>Preheat Notice:</strong> The sauna preheats automatically before your session so it will be hot and ready when you arrive!
       </div>
 
       <button onclick="location.reload()" class="btn-submit">Book Another Session</button>
@@ -501,7 +501,6 @@
       slots.forEach(slot => {
         const isAvailable = slot.status === 'available';
         const isBooked = slot.status === 'booked';
-        const isLeadLocked = slot.status === 'lead_time_locked';
 
         let badgeLabel = 'Available';
         let badgeClass = 'badge-available';
@@ -509,8 +508,8 @@
         if (isBooked) {
           badgeLabel = `Booked (${slot.booked_by_cabin || 'Occupied'})`;
           badgeClass = 'badge-booked';
-        } else if (isLeadLocked) {
-          badgeLabel = 'Requires 2h Lead Time';
+        } else if (!isAvailable) {
+          badgeLabel = 'Unavailable';
           badgeClass = 'badge-leadtime';
         }
 
