@@ -375,6 +375,20 @@
         </div>
       </div>
 
+      <!-- Sauna Guidelines & Rules Card -->
+      <div style="background: #fafafa; border: 1px solid #e5e7eb; border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px;">
+        <h3 style="font-size: 13px; font-weight: 700; color: var(--forest-green); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>♨️</span> Sauna Guidelines & Etiquette
+        </h3>
+        <ul style="font-size: 12px; color: var(--text-secondary); padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 5px; line-height: 1.45;">
+          <li><strong>Private Sessions (8am–4pm):</strong> 50 minutes of private heat for your cabin. Please vacate at 10 min to the hour.</li>
+          <li><strong>Automated Preheat:</strong> The wood-fired sauna preheats automatically so it is hot and ready for your reserved slot.</li>
+          <li><strong>Hydration & Towels:</strong> Please sit on a clean towel on wooden benches and drink plenty of water.</li>
+          <li><strong>Safety Rules:</strong> Glass containers, alcohol, and open flames are strictly prohibited inside the sauna.</li>
+          <li><strong>Communal Hours (4pm onwards):</strong> Open communal access for all camp guests without reservations needed.</li>
+        </ul>
+      </div>
+
       <!-- Slot Picker Section -->
       <div class="section-title-row">
         <h2>Select Private Time Slot (50 min)</h2>
@@ -457,10 +471,27 @@
     }
 
     const dateInput = document.getElementById('session-date');
-    dateInput.value = getTodayStr();
+    const todayStr = getTodayStr();
+    dateInput.value = todayStr;
+    dateInput.min = todayStr;
 
-    // Auto fill query params if provided in URL (e.g. ?name=Eric&cabin=Forest 4)
+    // Auto fill & restrict stay date range from query params
     const urlParams = new URLSearchParams(window.location.search);
+    const checkinParam = urlParams.get('checkin') || urlParams.get('arrival') || urlParams.get('start');
+    const checkoutParam = urlParams.get('checkout') || urlParams.get('departure') || urlParams.get('end');
+
+    if (checkinParam) {
+      if (checkinParam >= todayStr) {
+        dateInput.min = checkinParam;
+        dateInput.value = checkinParam;
+      } else {
+        dateInput.min = todayStr;
+      }
+    }
+    if (checkoutParam) {
+      dateInput.max = checkoutParam;
+    }
+
     if (urlParams.get('firstname') || urlParams.get('name')) {
       const fn = urlParams.get('firstname') || '';
       const ln = urlParams.get('lastname') || '';
@@ -484,13 +515,13 @@
         const res = await fetch(`${API_BASE}/api/sauna/availability?date=${dateStr}`);
         if (!res.ok) throw new Error('Failed to fetch availability');
         const json = await res.json();
-        renderSlots(json.slots || []);
+        renderSlots(json.slots || [], dateStr);
       } catch (err) {
         container.innerHTML = '<div style="color: #991b1b; padding: 12px; background: #fee2e2; border-radius: 6px; font-size: 13px;">Unable to load sauna availability. Please check your connection.</div>';
       }
     }
 
-    function renderSlots(slots) {
+    function renderSlots(slots, dateStr) {
       const container = document.getElementById('slots-container');
       if (slots.length === 0) {
         container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">No slots available for this date.</div>';
@@ -499,13 +530,19 @@
 
       let html = '<div class="slots-grid">';
       slots.forEach(slot => {
-        const isAvailable = slot.status === 'available';
+        let isAvailable = slot.status === 'available';
         const isBooked = slot.status === 'booked';
 
         let badgeLabel = 'Available';
         let badgeClass = 'badge-available';
 
-        if (isBooked) {
+        // Check if selected date is checkout day (limit to slots starting before 9am)
+        if (checkoutParam && dateStr === checkoutParam && slot.start_time >= '09:00') {
+          isAvailable = false;
+          badgeLabel = 'After Checkout';
+          badgeClass = 'badge-leadtime';
+        } else if (isBooked) {
+          isAvailable = false;
           badgeLabel = `Booked (${slot.booked_by_cabin || 'Occupied'})`;
           badgeClass = 'badge-booked';
         } else if (!isAvailable) {
