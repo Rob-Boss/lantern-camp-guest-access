@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserve Wood-Fired Sauna | Lantern Camp</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    :root {
+      --bg-color: #faf8f5;
+      --card-bg: #ffffff;
+      --border-color: #e2e8e4;
+      --text-primary: #2d312e;
+      --text-secondary: #606862;
+      --forest-green: #2d4a3e;
+      --forest-green-hover: #1e352b;
+      --sage-light: #f0f4f1;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      line-height: 1.5;
+      padding: 20px 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(45, 74, 62, 0.06);
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header-icon {
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--forest-green);
+      letter-spacing: -0.01em;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .input, .select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background: #ffffff;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .input:focus, .select:focus {
+      border-color: var(--forest-green);
+      box-shadow: 0 0 0 2px rgba(45, 74, 62, 0.1);
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .section-title-row h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--forest-green);
+    }
+
+    .section-title-row span {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .slot-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid #e5e7eb;
+      background: #fafafa;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .slot-btn:hover:not(:disabled) {
+      border-color: var(--forest-green);
+      background: var(--sage-light);
+    }
+
+    .slot-btn.selected {
+      background: var(--forest-green) !important;
+      border-color: var(--forest-green) !important;
+      color: #ffffff !important;
+    }
+
+    .slot-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #f3f4f6;
+    }
+
+    .slot-time {
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .slot-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+
+    .badge-available {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-booked {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-leadtime {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .communal-card {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: #1e40af;
+      line-height: 1.4;
+    }
+
+    .booking-form {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed #d1d5db;
+    }
+
+    .rules-box {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 14px 0 18px 0;
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+
+    .rules-box input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      cursor: pointer;
+    }
+
+    .rules-box label {
+      font-size: 12px;
+      color: var(--text-primary);
+      cursor: pointer;
+      line-height: 1.45;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--forest-green);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(45, 74, 62, 0.2);
+      transition: background-color 0.15s;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--forest-green-hover);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top-color: var(--forest-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .success-card {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .success-card h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--forest-green);
+      margin: 10px 0 6px 0;
+    }
+
+    .summary-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 20px 0;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .notice-box {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #b45309;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      text-align: left;
+      margin-bottom: 20px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Main Content Area -->
+    <div id="main-view">
+      <div class="header">
+        <div class="header-icon">🪵</div>
+        <div>
+          <h1>Wood-Fired Sauna Experience</h1>
+          <p>Reserve private 50-minute sessions (8:00 AM – 4:00 PM)</p>
+        </div>
+      </div>
+
+      <!-- Date & Cabin Controls -->
+      <div class="controls-grid">
+        <div class="form-group">
+          <label class="label">📅 Date of Session</label>
+          <input type="date" id="session-date" class="input">
+        </div>
+        <div class="form-group">
+          <label class="label">🏡 Your Cabin</label>
+          <select id="cabin-select" class="select">
+            <option value="Forest 1">Forest Cabin 1</option>
+            <option value="Forest 2">Forest Cabin 2</option>
+            <option value="Forest 3">Forest Cabin 3</option>
+            <option value="Forest 4">Forest Cabin 4</option>
+            <option value="Forest 5">Forest Cabin 5</option>
+            <option value="Forest 6">Forest Cabin 6</option>
+            <option value="Forest 7">Forest Cabin 7</option>
+            <option value="Forest 8">Forest Cabin 8</option>
+            <option value="Forest 9">Forest Cabin 9</option>
+            <option value="Forest 10">Forest Cabin 10</option>
+            <option value="Forest 11">Forest Cabin 11</option>
+            <option value="Forest 12">Forest Cabin 12</option>
+            <option value="Field 1">Field Cabin 1</option>
+            <option value="Field 2">Field Cabin 2</option>
+            <option value="Field 3">Field Cabin 3</option>
+            <option value="Field 4">Field Cabin 4</option>
+            <option value="Field 5">Field Cabin 5</option>
+            <option value="Field 6">Field Cabin 6</option>
+            <option value="Field 7">Field Cabin 7</option>
+            <option value="Field 8">Field Cabin 8</option>
+            <option value="Field 9">Field Cabin 9</option>
+            <option value="Field 10">Field Cabin 10</option>
+            <option value="Field 11">Field Cabin 11</option>
+            <option value="Field 12">Field Cabin 12</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Slot Picker Section -->
+      <div class="section-title-row">
+        <h2>Select Private Time Slot (50 min)</h2>
+        <span>8:00 AM – 4:00 PM</span>
+      </div>
+
+      <div id="slots-container">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="communal-card">
+        👥 <strong>Open Communal Hours (4:00 PM Onwards):</strong> No reservation needed after 4:00 PM. The wood-fired sauna is open for all camp guests to enjoy together!
+      </div>
+
+      <!-- Guest Booking Form -->
+      <div id="booking-form-wrap" class="booking-form" style="display: none;">
+        <h2 id="selected-slot-title" style="font-size: 14px; font-weight: 700; color: var(--forest-green); margin-bottom: 12px;"></h2>
+        
+        <div class="controls-grid">
+          <div class="form-group">
+            <label class="label">Your Name *</label>
+            <input type="text" id="guest-name" class="input" placeholder="e.g. Eric Ornstein" required>
+          </div>
+          <div class="form-group">
+            <label class="label">Email Address (For Reminders)</label>
+            <input type="email" id="guest-email" class="input" placeholder="e.g. eric@example.com">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label class="label">Phone Number (Optional)</label>
+          <input type="tel" id="guest-phone" class="input" placeholder="(555) 000-0000">
+        </div>
+
+        <div class="rules-box">
+          <input type="checkbox" id="rules-check">
+          <label for="rules-check">
+            I agree to the <strong>Wood-Fired Sauna Etiquette & Safety Notice</strong> (hydrate, limit private sessions to 50 minutes, and exercise care around the wood stove).
+          </label>
+        </div>
+
+        <button id="btn-submit" class="btn-submit" type="button">Confirm Private Sauna Reservation</button>
+      </div>
+    </div>
+
+    <!-- Success View -->
+    <div id="success-view" class="success-card" style="display: none;">
+      <div style="font-size: 48px;">🎉</div>
+      <h2>Private Session Confirmed!</h2>
+      <p style="font-size: 13px; color: var(--text-secondary);">Your 50-minute private sauna session is locked in.</p>
+
+      <div class="summary-box">
+        <div class="summary-row"><span>📅 Date:</span> <strong id="succ-date"></strong></div>
+        <div class="summary-row"><span>⏰ Time Slot:</span> <strong id="succ-time"></strong></div>
+        <div class="summary-row"><span>🏡 Cabin:</span> <strong id="succ-cabin"></strong></div>
+        <div class="summary-row"><span>👤 Guest:</span> <strong id="succ-name"></strong></div>
+      </div>
+
+      <div class="notice-box">
+        🔥 <strong>Stoking Notice:</strong> Camp staff will begin stoking the wood stove 2 hours prior to your session so the sauna reaches peak temperature!
+      </div>
+
+      <button onclick="location.reload()" class="btn-submit">Book Another Session</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://lantern-analytics.vercel.app";
+    let selectedSlotObj = null;
+
+    // Get today's date string YYYY-MM-DD
+    function getTodayStr() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    const dateInput = document.getElementById('session-date');
+    dateInput.value = getTodayStr();
+
+    // Auto fill query params if provided in URL (e.g. ?name=Eric&cabin=Forest 4)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('firstname') || urlParams.get('name')) {
+      const fn = urlParams.get('firstname') || '';
+      const ln = urlParams.get('lastname') || '';
+      const full = (fn + ' ' + ln).trim() || urlParams.get('name') || '';
+      document.getElementById('guest-name').value = full;
+    }
+    if (urlParams.get('email')) document.getElementById('guest-email').value = urlParams.get('email');
+    if (urlParams.get('phone')) document.getElementById('guest-phone').value = urlParams.get('phone');
+    if (urlParams.get('cabin')) {
+      document.getElementById('cabin-select').value = urlParams.get('cabin');
+    }
+
+    async function loadAvailability(dateStr) {
+      const container = document.getElementById('slots-container');
+      const formWrap = document.getElementById('booking-form-wrap');
+      formWrap.style.display = 'none';
+      selectedSlotObj = null;
+
+      container.innerHTML = '<div class="spinner"></div>';
+      try {
+        const res = await fetch(`${API_BASE}/api/sauna/availability?date=${dateStr}`);
+        if (!res.ok) throw new Error('Failed to fetch availability');
+        const json = await res.json();
+        renderSlots(json.slots || []);
+      } catch (err) {
+        container.innerHTML = '<div style="color: #991b1b; padding: 12px; background: #fee2e2; border-radius: 6px; font-size: 13px;">Unable to load sauna availability. Please check your connection.</div>';
+      }
+    }
+
+    function renderSlots(slots) {
+      const container = document.getElementById('slots-container');
+      if (slots.length === 0) {
+        container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">No slots available for this date.</div>';
+        return;
+      }
+
+      let html = '<div class="slots-grid">';
+      slots.forEach(slot => {
+        const isAvailable = slot.status === 'available';
+        const isBooked = slot.status === 'booked';
+        const isLeadLocked = slot.status === 'lead_time_locked';
+
+        let badgeLabel = 'Available';
+        let badgeClass = 'badge-available';
+
+        if (isBooked) {
+          badgeLabel = `Booked (${slot.booked_by_cabin || 'Occupied'})`;
+          badgeClass = 'badge-booked';
+        } else if (isLeadLocked) {
+          badgeLabel = 'Requires 2h Lead Time';
+          badgeClass = 'badge-leadtime';
+        }
+
+        const disabledAttr = !isAvailable ? 'disabled' : '';
+
+        html += `
+          <button type="button" class="slot-btn" ${disabledAttr} data-time="${slot.start_time}" data-label="${slot.display_label}">
+            <span class="slot-time">${slot.display_label}</span>
+            <span class="slot-badge ${badgeClass}">${badgeLabel}</span>
+          </button>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+
+      // Attach click events
+      container.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedSlotObj = {
+            start_time: btn.getAttribute('data-time'),
+            display_label: btn.getAttribute('data-label')
+          };
+          document.getElementById('selected-slot-title').innerText = `Confirm Reservation for ${selectedSlotObj.display_label}`;
+          document.getElementById('booking-form-wrap').style.display = 'block';
+          document.getElementById('booking-form-wrap').scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    }
+
+    dateInput.addEventListener('change', (e) => {
+      if (e.target.value) loadAvailability(e.target.value);
+    });
+
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      if (!selectedSlotObj) return alert('Please select a time slot.');
+      const name = document.getElementById('guest-name').value.trim();
+      if (!name) return alert('Please enter your name.');
+      const agreed = document.getElementById('rules-check').checked;
+      if (!agreed) return alert('Please confirm that you agree to the sauna safety guidelines.');
+
+      const dateStr = dateInput.value;
+      const cabin = document.getElementById('cabin-select').value;
+      const email = document.getElementById('guest-email').value.trim();
+      const phone = document.getElementById('guest-phone').value.trim();
+
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerText = 'Reserving Slot...';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/sauna/book`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_date: dateStr,
+            start_time: selectedSlotObj.start_time,
+            guest_name: name,
+            guest_email: email,
+            guest_phone: phone,
+            cabin_name: cabin
+          })
+        });
+
+        const json = await res.json();
+        if (res.ok && json.status === 'success') {
+          document.getElementById('succ-date').innerText = dateStr;
+          document.getElementById('succ-time').innerText = selectedSlotObj.display_label;
+          document.getElementById('succ-cabin').innerText = cabin;
+          document.getElementById('succ-name').innerText = name;
+
+          document.getElementById('main-view').style.display = 'none';
+          document.getElementById('success-view').style.display = 'block';
+        } else {
+          alert(json.detail || 'Failed to book sauna slot.');
+          btn.disabled = false;
+          btn.innerText = 'Confirm Private Sauna Reservation';
+        }
+      } catch (err) {
+        alert('Error connecting to server. Please try again.');
+        btn.disabled = false;
+        btn.innerText = 'Confirm Private Sauna Reservation';
+      }
+    });
+
+    // Initial load
+    loadAvailability(dateInput.value);
+  </script>
+</body>
+</html>

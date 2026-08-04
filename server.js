@@ -93,6 +93,13 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Route /sauna to sauna.html
+  if (pathname === '/sauna' || pathname === '/sauna.html') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(fs.readFileSync(path.join(__dirname, 'sauna.html')));
+    return;
+  }
+
   // Route root to index.html
   if (pathname === '/' || pathname === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
