@@ -442,7 +442,9 @@
   </div>
 
   <script>
-    const API_BASE = "https://lantern-analytics.vercel.app";
+    const API_BASE = window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")
+      ? ""
+      : "https://operations.lanterncamp.com";
     let selectedSlotObj = null;
 
     // Get today's date string YYYY-MM-DD
