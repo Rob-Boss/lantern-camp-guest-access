@@ -530,13 +530,6 @@
           </label>
         </div>
 
-        <div class="checkbox-group">
-          <input type="checkbox" id="marketing-optin" checked>
-          <label for="marketing-optin">
-            Yes, keep me updated on news, seasonal offers, and events at Lantern Camp (optional).
-          </label>
-        </div>
-
         <button type="submit" id="submit-btn" class="btn" disabled>
           Sign Waiver & Confirm Contact Info
         </button>
@@ -609,7 +602,6 @@
     const guestPhone = document.getElementById('guest-phone');
     const guestEmail = document.getElementById('guest-email');
     const agreeWaiver = document.getElementById('agree-waiver');
-    const marketingOptin = document.getElementById('marketing-optin');
     const submitBtn = document.getElementById('submit-btn');
     const btnChangePhone = document.getElementById('btn-change-phone');
 
@@ -801,7 +793,7 @@
       const name = `${firstName} ${lastName}`.trim();
       const phone = guestPhone.value.trim();
       const email = guestEmail.value.trim();
-      const optIn = marketingOptin.checked;
+      const optIn = true;
       const bringingPet = document.getElementById('bringing-pet') ? document.getElementById('bringing-pet').checked : false;
 
       if (!firstName || !lastName || !phone || !email || !agreeWaiver.checked) {

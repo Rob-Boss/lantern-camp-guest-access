@@ -255,7 +255,7 @@ function parseToISO(dateStr) {
           email,
           phone || '',
           'TRUE',
-          optIn ? 'TRUE' : 'FALSE',
+          'TRUE',
           parseToISO(checkinDateVal),
           parseToISO(checkoutDateVal)
         ]);
