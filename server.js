@@ -84,6 +84,33 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Proxy /api/sauna requests to production backend operations.lanterncamp.com
+  if (pathname.startsWith('/api/sauna')) {
+    try {
+      const targetUrl = `https://operations.lanterncamp.com${req.url}`;
+      const headers = { ...req.headers, host: 'operations.lanterncamp.com' };
+      const body = req.method === 'POST' ? JSON.stringify(await getBody()) : undefined;
+
+      const proxyRes = await fetch(targetUrl, {
+        method: req.method,
+        headers,
+        body
+      });
+
+      const responseData = await proxyRes.text();
+      res.writeHead(proxyRes.status, {
+        'Content-Type': proxyRes.headers.get('content-type') || 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(responseData);
+    } catch (err) {
+      console.error('Sauna API Proxy Error:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Proxy Error', details: err.message }));
+    }
+    return;
+  }
+
   // Rewrite /:token (6 character alphanumeric string) to index.html (client-side JS will resolve the token)
   const tokenMatch = pathname.match(/^\/([a-zA-Z0-9]{6})$/);
   if (tokenMatch) {

@@ -104,13 +104,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { token, code } = req.query;
+    const { token, code, booking_id, bookingId, id } = req.query;
     let body = {};
     if (req.method === 'POST') {
       body = req.body || {};
     }
     
-    const activeToken = token || code || body.token || body.code;
+    const activeToken = booking_id || bookingId || id || token || code || body.booking_id || body.bookingId || body.id || body.token || body.code;
     
     let cabinInfo = cabins[activeToken];
     if (!cabinInfo) {
@@ -144,13 +144,17 @@ function parseToISO(dateStr) {
       const qCheckout = parseToISO(req.query.checkout || '');
       const targetCode = code || token || activeToken;
 
+      console.log('[CHECKIN DEBUG] targetCode:', targetCode, 'qName:', qName, 'qCheckin:', qCheckin);
       if (targetCode || qName || qCheckin) {
         try {
           const operationsApiUrl = process.env.OPERATIONS_API_URL || 'https://operations.lanterncamp.com';
+          console.log('[CHECKIN DEBUG] Fetching from:', `${operationsApiUrl}/api/dashboard/bookings`);
           const bRes = await fetch(`${operationsApiUrl}/api/dashboard/bookings`);
+          console.log('[CHECKIN DEBUG] bRes status:', bRes.status);
           if (bRes.ok) {
             const data = await bRes.json();
             const bookings = data.bookings || [];
+            console.log('[CHECKIN DEBUG] Total bookings fetched:', bookings.length);
             
             // 1. Try matching by ID, notes, or origin (SiteMinder HMXXXXXX)
             if (targetCode) {
@@ -160,6 +164,7 @@ function parseToISO(dateStr) {
                 (b.notes && b.notes.toLowerCase().includes(codeLower)) ||
                 (b.origin && b.origin.toLowerCase().includes(codeLower))
               );
+              console.log('[CHECKIN DEBUG] Found bookingDetails by targetCode:', bookingDetails ? bookingDetails.guest_name : 'NONE');
             }
             
             // 2. Fallback: Try matching by guest name & checkin date
@@ -189,11 +194,15 @@ function parseToISO(dateStr) {
       }
 
       const isSpecificCabin = cabins[activeToken] && cabins[activeToken].type !== 'General';
-      const displayCabinName = isSpecificCabin ? cabins[activeToken].cabinName : cabinInfo.cabinName;
+      const displayCabinName = (bookingDetails && bookingDetails.cabin_name) 
+        ? bookingDetails.cabin_name 
+        : (isSpecificCabin ? cabins[activeToken].cabinName : cabinInfo.cabinName);
 
       return res.status(200).json({
         cabinName: displayCabinName,
         guestName: (bookingDetails && bookingDetails.guest_name) ? bookingDetails.guest_name : (qName || ""),
+        guestEmail: (bookingDetails && bookingDetails.guest_email) ? bookingDetails.guest_email : "",
+        guestPhone: (bookingDetails && bookingDetails.guest_phone) ? bookingDetails.guest_phone : "",
         checkinDate: (bookingDetails && bookingDetails.check_in_date) ? parseToISO(bookingDetails.check_in_date) : qCheckin,
         checkoutDate: (bookingDetails && bookingDetails.check_out_date) ? parseToISO(bookingDetails.check_out_date) : qCheckout,
         type: cabinInfo.type

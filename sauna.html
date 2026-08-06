@@ -434,10 +434,10 @@
           <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="font-size: 13px; font-weight: 700; color: var(--forest-green); margin-bottom: 6px;">
-                👥 Open Communal Hours (5pm Onwards)
+                👥 Open Communal Hours (5:00 PM – 7:00 PM)
               </div>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0 0 10px 0;">
-                Open access for all registered camp guests to share and enjoy together without reservations needed.
+                Open access from 5:00 PM to 7:00 PM for all registered camp guests to share and enjoy together without reservations needed.
               </p>
             </div>
             <div style="font-size: 12px; color: var(--forest-green); font-weight: 700; font-style: italic;">
@@ -474,7 +474,7 @@
         <div id="timetable-header-row" style="margin-bottom: 12px;">
           <h2 style="font-size: 15px; font-weight: 800; color: var(--forest-green);">Available Private Time Slots</h2>
           <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-            Private sessions run hourly (Check-in 3:00 PM through Departure 9:00 AM).
+            Private sessions run hourly (From 3:00 PM day of check-in until 9:00 AM day of check-out).
           </p>
         </div>
 
@@ -483,7 +483,7 @@
         </div>
 
         <div class="communal-card">
-          👥 <strong>Open Communal Hours (5:00 PM Onwards):</strong> No reservation needed after 5:00 PM. The cedarwood sauna is open for all camp guests to enjoy together!
+          👥 <strong>Open Communal Hours (5:00 PM – 7:00 PM):</strong> No reservation needed from 5:00 PM to 7:00 PM. The cedarwood sauna is open for all camp guests to enjoy together!
         </div>
 
         <!-- Guest Booking Form -->
@@ -550,11 +550,15 @@
 
     // Parse reservation query params from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const checkinParam = urlParams.get('checkin') || urlParams.get('arrival') || urlParams.get('start') || todayStr;
-    const checkoutParam = urlParams.get('checkout') || urlParams.get('departure') || urlParams.get('end') || todayStr;
-    const cabinParam = urlParams.get('cabin') || 'Forest 1';
+    const bookingIdParam = urlParams.get('booking_id') || urlParams.get('bookingId') || urlParams.get('id') || urlParams.get('t') || urlParams.get('token') || urlParams.get('code');
+    
+    let checkinParam = urlParams.get('checkin') || urlParams.get('arrival') || urlParams.get('start') || todayStr;
+    let checkoutParam = urlParams.get('checkout') || urlParams.get('departure') || urlParams.get('end') || todayStr;
+    let cabinParam = urlParams.get('cabin') || 'Forest Cabin';
 
     let guestFullName = 'Guest';
+    let guestEmail = urlParams.get('email') || '';
+    let guestPhone = urlParams.get('phone') || '';
     if (urlParams.get('firstname') || urlParams.get('name')) {
       const fn = urlParams.get('firstname') || '';
       const ln = urlParams.get('lastname') || '';
@@ -591,19 +595,54 @@
       return `${months[mmIn]} ${ddIn} – ${months[mmOut]} ${ddOut}, ${yyyy}`;
     }
 
-    // Populate Context Banner
-    document.getElementById('banner-guest-name').innerText = guestFullName;
-    document.getElementById('banner-cabin-name').innerText = cabinParam;
-    document.getElementById('banner-stay-dates').innerText = formatStayRange(checkinParam, checkoutParam);
+    function updateBannerUI() {
+      document.getElementById('banner-guest-name').innerText = guestFullName;
+      document.getElementById('banner-cabin-name').innerText = cabinParam;
+      document.getElementById('banner-stay-dates').innerText = formatStayRange(checkinParam, checkoutParam);
+    }
+
+    if (bookingIdParam) {
+      document.getElementById('banner-guest-name').innerText = 'Loading...';
+      document.getElementById('banner-cabin-name').innerText = 'Loading...';
+      document.getElementById('banner-stay-dates').innerText = 'Loading...';
+    } else {
+      updateBannerUI();
+    }
+
+    let initPromise = null;
+
+    // Auto-fetch exact live reservation data by booking_id
+    async function initReservationDetails() {
+      if (bookingIdParam) {
+        try {
+          const res = await fetch(`/api/checkin?booking_id=${encodeURIComponent(bookingIdParam)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.guestName) guestFullName = data.guestName;
+            if (data.cabinName && data.cabinName !== 'Lantern Camp Orland') cabinParam = data.cabinName;
+            if (data.checkinDate) checkinParam = data.checkinDate;
+            if (data.checkoutDate) checkoutParam = data.checkoutDate;
+            if (data.guestEmail) guestEmail = data.guestEmail;
+            if (data.guestPhone) guestPhone = data.guestPhone;
+          }
+        } catch (e) {
+          console.warn('Live reservation lookup warning:', e);
+        }
+      }
+      updateBannerUI();
+    }
+    
+    initPromise = initReservationDetails();
 
     // Handle "Book a Private Session" button click
     const btnShowTimetable = document.getElementById('btn-show-timetable');
     const timetableSection = document.getElementById('timetable-section');
 
-    btnShowTimetable.addEventListener('click', () => {
+    btnShowTimetable.addEventListener('click', async () => {
       timetableSection.style.display = 'block';
       btnShowTimetable.style.display = 'none';
       timetableSection.scrollIntoView({ behavior: 'smooth' });
+      if (initPromise) await initPromise;
       loadStayAvailability();
     });
 
@@ -623,10 +662,12 @@
           renderRangeDays(json.days);
         } else if (json.slots) {
           renderSingleDay(json.slots, json.date || todayStr);
+        } else {
+          throw new Error('No slots available');
         }
       } catch (err) {
         console.error(err);
-        container.innerHTML = '<div style="color: #991b1b; padding: 12px; background: #fee2e2; border-radius: 6px; font-size: 13px;">Unable to load sauna availability. Please check your connection.</div>';
+        container.innerHTML = '<div style="color: #991b1b; padding: 12px; background: #fee2e2; border-radius: 6px; font-size: 13px;">Unable to load sauna availability. Please try again.</div>';
       }
     }
 
@@ -715,8 +756,8 @@
       if (!agreed) return alert('Please confirm that you agree to the sauna safety guidelines.');
 
       const name = guestFullName;
-      const email = urlParams.get('email') || '';
-      const phone = urlParams.get('phone') || '';
+      const email = guestEmail || urlParams.get('email') || '';
+      const phone = guestPhone || urlParams.get('phone') || '';
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
@@ -727,6 +768,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            booking_id: bookingIdParam || '',
             session_date: selectedSlotObj.date,
             start_time: selectedSlotObj.start_time,
             guest_name: name,
