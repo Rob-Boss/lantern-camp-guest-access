@@ -654,7 +654,17 @@
 
       container.innerHTML = '<div class="spinner"></div>';
       try {
-        const res = await fetch(`${API_BASE}/api/sauna/availability?checkin=${checkinParam}&checkout=${checkoutParam}`);
+        let endpoint = `${API_BASE}/api/sauna/availability?checkin=${encodeURIComponent(checkinParam)}&checkout=${encodeURIComponent(checkoutParam)}`;
+        if (!checkinParam && !checkoutParam) {
+          endpoint = `${API_BASE}/api/sauna/availability?date=${encodeURIComponent(todayStr)}`;
+        }
+        let res = await fetch(endpoint);
+        if (!res.ok) {
+          let altEndpoint = endpoint.includes('/availability') 
+            ? endpoint.replace('/availability', '/available-slots')
+            : `${API_BASE}/api/sauna/available-slots?date=${encodeURIComponent(todayStr)}`;
+          res = await fetch(altEndpoint);
+        }
         if (!res.ok) throw new Error('Failed to fetch availability');
         const json = await res.json();
         

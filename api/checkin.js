@@ -156,36 +156,15 @@ function parseToISO(dateStr) {
             const bookings = data.bookings || [];
             console.log('[CHECKIN DEBUG] Total bookings fetched:', bookings.length);
             
-            // 1. Try matching by ID, notes, or origin (SiteMinder HMXXXXXX)
-            if (targetCode) {
+            // Match strictly by targetCode (ID, notes, or origin)
+            if (targetCode && String(targetCode).toLowerCase() !== 'waiver') {
               const codeLower = String(targetCode).toLowerCase();
               bookingDetails = bookings.find(b => 
-                String(b.id) === String(targetCode) || 
+                String(b.id).toLowerCase() === codeLower || 
                 (b.notes && b.notes.toLowerCase().includes(codeLower)) ||
                 (b.origin && b.origin.toLowerCase().includes(codeLower))
               );
               console.log('[CHECKIN DEBUG] Found bookingDetails by targetCode:', bookingDetails ? bookingDetails.guest_name : 'NONE');
-            }
-            
-            // 2. Fallback: Try matching by guest name & checkin date
-            if (!bookingDetails && (qName || qCheckin)) {
-              bookingDetails = bookings.find(b => {
-                const matchName = qName ? (b.guest_name || '').toLowerCase().includes(qName.toLowerCase()) : true;
-                const matchDate = qCheckin ? parseToISO(b.check_in_date) === qCheckin : true;
-                return matchName && matchDate;
-              });
-            }
-
-            // 3. Fallback for new Airbnb codes: Match upcoming Airbnb bookings
-            if (!bookingDetails && targetCode && String(targetCode).length > 5) {
-              const todayStr = new Date().toISOString().split('T')[0];
-              const upcomingAirbnb = bookings.filter(b => 
-                b.channel && b.channel.toLowerCase().includes('airbnb') && 
-                b.check_in_date >= todayStr
-              );
-              if (upcomingAirbnb.length === 1) {
-                bookingDetails = upcomingAirbnb[0];
-              }
             }
           }
         } catch (e) {
